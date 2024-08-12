@@ -7,4 +7,5 @@
     <color name="header_text">#1A1B22</color>
     <color name="transparent">#00000000</color>
     <color name="main_activity_background">#3772E7</color>
+    <color name="text_color_hint">#AEAFB4</color>
 </resources>

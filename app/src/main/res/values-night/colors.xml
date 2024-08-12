@@ -5,4 +5,5 @@
     <color name="header_text">#FFFFFF</color>
     <color name="settings_text_button">#FFFFFF</color>
     <color name="main_activity_background">#1A1B22</color>
+    <color name="text_color_hint">#1A1B22</color>
 </resources>
