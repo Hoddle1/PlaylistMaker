@@ -4,6 +4,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@color/main_activity_background"
     android:orientation="vertical">
 
     <LinearLayout
@@ -28,34 +29,43 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-        android:orientation="horizontal">
+        android:paddingVertical="8dp">
 
         <EditText
             android:id="@+id/searchEditText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:importantForAutofill="no"
+            android:background="@drawable/rounded_edittext_background"
+            android:drawableStart="@drawable/ic_search_16"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/text_color_hint"
+            android:fontFamily="@font/ys_display_regular"
             android:hint="@string/search"
-            android:maxLines="1"
+            android:importantForAutofill="no"
             android:inputType="text"
-            android:textColor="@color/black"
-            android:textColorHint="@color/text_color_hint" />
+            android:maxLines="1"
+            android:paddingVertical="8dp"
+            android:paddingStart="14dp"
+            android:paddingEnd="@dimen/search_end_icon_padding"
+            android:textColor="@color/main_text"
+            android:textColorHint="@color/text_color_hint"
+            android:textFontWeight="400"
+            android:textSize="@dimen/normal_text_size" />
 
         <ImageView
             android:id="@+id/clearIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_width="@dimen/search_end_icon_padding"
+            android:layout_height="20dp"
+            android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/reset_search"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:visibility="gone" />
-    </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

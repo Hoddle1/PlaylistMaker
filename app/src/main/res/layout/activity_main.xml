@@ -33,7 +33,7 @@
             android:id="@+id/search"
             style="@style/MainMenuButton"
             android:text="@string/search"
-            app:icon="@drawable/ic_search" />
+            app:icon="@drawable/ic_search_24" />
 
         <Button
             android:id="@+id/library"
