@@ -24,8 +24,12 @@
             app:tint="@color/header_text" />
 
         <TextView
-            style="@style/SettingsHeaderText"
-            android:text="@string/search" />
+            style="@style/HeaderText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/search"
+            android:textColor="@color/header_text" />
 
     </LinearLayout>
 
@@ -60,12 +64,14 @@
 
         <ImageView
             android:id="@+id/clearIcon"
-            android:layout_width="@dimen/search_end_icon_padding"
-            android:layout_height="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/reset_search"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:visibility="gone" />
+            android:padding="12dp"
+            android:src="@drawable/ic_cross"
+            android:visibility="gone"
+            app:tint="@color/text_color_hint" />
     </FrameLayout>
 
 </LinearLayout>

@@ -24,8 +24,12 @@
             app:tint="@color/header_text" />
 
         <TextView
-            style="@style/SettingsHeaderText"
-            android:text="@string/settings" />
+            style="@style/HeaderText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/settings"
+            android:textColor="@color/header_text" />
 
     </LinearLayout>
 
@@ -34,59 +38,41 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <FrameLayout
-            style="@style/SettingsHorizontalContainer">
+        <androidx.appcompat.widget.SwitchCompat
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:fontFamily="@font/ys_display_regular"
+            android:paddingHorizontal="16dp"
+            android:text="@string/night_theme"
+            android:textColor="@color/settings_text_button"
+            android:textFontWeight="400"
+            android:textSize="16sp" />
 
-            <TextView
-                style="@style/SettingsMenuItemText"
-                android:text="@string/night_theme" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|center" />
-        </FrameLayout>
-
-        <FrameLayout
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/shareApp"
-            style="@style/SettingsHorizontalContainer">
+            style="@style/SettingsMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/share_app"
+            app:icon="@drawable/ic_share" />
 
-            <TextView
-                style="@style/SettingsMenuItemText"
-                android:text="@string/share_app" />
-
-            <ImageView
-                style="@style/SettingsMenuItemImage"
-                android:contentDescription="@string/share_app"
-                android:src="@drawable/ic_share" />
-        </FrameLayout>
-
-        <FrameLayout
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/sendSupport"
-            style="@style/SettingsHorizontalContainer">
+            style="@style/SettingsMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/write_to_support"
+            app:icon="@drawable/ic_support" />
 
-            <TextView
-                style="@style/SettingsMenuItemText"
-                android:text="@string/write_to_support" />
-
-            <ImageView
-                style="@style/SettingsMenuItemImage"
-                android:contentDescription="@string/write_to_support"
-                android:src="@drawable/ic_support" />
-        </FrameLayout>
-
-        <FrameLayout
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/userAgreement"
-            style="@style/SettingsHorizontalContainer">
+            style="@style/SettingsMenuItem"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
 
-            <TextView
-                style="@style/SettingsMenuItemText"
-                android:text="@string/agreement" />
+            android:text="@string/agreement"
+            app:icon="@drawable/ic_arrow_forward" />
 
-            <ImageView
-                style="@style/SettingsMenuItemImage"
-                android:contentDescription="@string/agreement"
-                android:src="@drawable/ic_arrow_forward" />
-        </FrameLayout>
     </LinearLayout>
+
 </LinearLayout>

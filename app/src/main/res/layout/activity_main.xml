@@ -16,34 +16,49 @@
         android:paddingBottom="16dp">
 
         <TextView
-            style="@style/MainHeaderText"
+            style="@style/HeaderText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:text="@string/header_text"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:divider="@drawable/divider"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
-        android:paddingBottom="28dp">
+        android:paddingBottom="28dp"
+        android:showDividers="middle">
 
         <Button
             android:id="@+id/search"
             style="@style/MainMenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/search"
             app:icon="@drawable/ic_search_24" />
 
         <Button
             android:id="@+id/library"
             style="@style/MainMenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/library"
+
             app:icon="@drawable/ic_library" />
 
         <Button
             android:id="@+id/settings"
             style="@style/MainMenuButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/settings"
             app:icon="@drawable/ic_settings" />
     </LinearLayout>
