@@ -16,4 +16,6 @@
     <string name="mail_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="reset_search">Сбросить поиск</string>
     <string name="empty_string" />
+    <string name="track_image">Обложка трека</string>
+    <string name="go_over">Перейти</string>
 </resources>
