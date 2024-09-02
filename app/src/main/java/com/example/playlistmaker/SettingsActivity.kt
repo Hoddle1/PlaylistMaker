@@ -39,7 +39,7 @@ class SettingsActivity : AppCompatActivity() {
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.setType("text/plain")
             shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.android_link))
-            startActivity(Intent.createChooser(shareIntent, "Поделиться приложением"))
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
         }
 
         binding.sendSupport.setOnClickListener {
