@@ -18,4 +18,7 @@
     <string name="empty_string" />
     <string name="track_image">Обложка трека</string>
     <string name="go_over">Перейти</string>
+    <string name="track_author">Очень длинное название группы, да такое, что вылазит за границы контейнера</string>
+    <string name="track_timing">2:55</string>
+    <string name="track_name">Smells Like Teen Spirit</string>
 </resources>

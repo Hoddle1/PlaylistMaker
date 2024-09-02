@@ -6,4 +6,5 @@
     <dimen name="main_corner_radius_btn">16dp</dimen>
     <dimen name="main_icon_padding">8dp</dimen>
     <dimen name="search_end_icon_padding">32dp</dimen>
+    <dimen name="track_image_size">45dp</dimen>
 </resources>

@@ -2,14 +2,13 @@ package com.example.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 
 class SearchActivity : AppCompatActivity() {
@@ -23,8 +22,7 @@ class SearchActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         binding = ActivitySearchBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -41,18 +39,10 @@ class SearchActivity : AppCompatActivity() {
             binding.searchEditText.setText(searchText)
         }
 
-        val simpleTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.clearIcon.isVisible = !s.isNullOrEmpty()
-                searchText = s.toString()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
+        binding.searchEditText.doOnTextChanged{ s, _, _, _ ->
+            binding.clearIcon.isVisible = !s.isNullOrEmpty()
+            searchText = s.toString()
         }
-
-        binding.searchEditText.addTextChangedListener(simpleTextWatcher)
 
         val trackList = listOf(
             Track(
