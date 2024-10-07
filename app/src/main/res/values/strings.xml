@@ -21,4 +21,7 @@
     <string name="track_author">Очень длинное название группы, да такое, что вылазит за границы контейнера</string>
     <string name="track_timing">2:55</string>
     <string name="track_name">Smells Like Teen Spirit</string>
+    <string name="update">Обновить</string>
+    <string name="not_found">Ничего не нашлось</string>
+    <string name="no_internet">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
 </resources>
