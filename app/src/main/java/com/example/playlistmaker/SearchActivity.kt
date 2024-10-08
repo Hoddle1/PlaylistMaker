@@ -49,15 +49,19 @@ class SearchActivity : AppCompatActivity() {
 
         binding.back.setOnClickListener { finish() }
 
-        binding.clearIcon.setOnClickListener { clearSearchText() }
+        binding.clearIcon.setOnClickListener {
+            clearSearchText()
+            tracks.clear()
+            trackAdapter.notifyDataSetChanged()
+        }
 
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT, SEARCH_DEF)
             binding.queryInput.setText(searchText)
         }
 
-        binding.updateButton.setOnClickListener{
-
+        binding.placeholderUpdateButton.setOnClickListener{
+            search()
         }
 
         binding.queryInput.setOnEditorActionListener { _, actionId, _ ->
@@ -132,24 +136,35 @@ class SearchActivity : AppCompatActivity() {
             })
     }
 
-    private fun showMessage(status: Int) {
+    private fun showMessage(status: SearchStatus) {
         when (status) {
-            NORMAL -> {
+            SearchStatus.NORMAL -> {
                 binding.tracksList.visibility = View.VISIBLE
-                binding.placeholderNotFound.visibility = View.GONE
-                binding.placeholderNoInternet.visibility = View.GONE
+                binding.placeholderText.visibility = View.GONE
+                binding.placeholderImage.visibility = View.GONE
+                binding.placeholderUpdateButton.visibility = View.GONE
             }
 
-            NOT_FOUND -> {
+            SearchStatus.NOT_FOUND -> {
                 binding.tracksList.visibility = View.GONE
-                binding.placeholderNotFound.visibility = View.VISIBLE
-                binding.placeholderNoInternet.visibility = View.GONE
+                binding.placeholderText.text = getString(R.string.not_found)
+                binding.placeholderText.visibility = View.VISIBLE
+
+                binding.placeholderImage.setImageResource(R.drawable.not_found)
+                binding.placeholderImage.visibility = View.VISIBLE
+
+                binding.placeholderUpdateButton.visibility = View.GONE
             }
 
-            NO_INTERNET -> {
+            SearchStatus.NO_INTERNET -> {
                 binding.tracksList.visibility = View.GONE
-                binding.placeholderNotFound.visibility = View.GONE
-                binding.placeholderNoInternet.visibility = View.VISIBLE
+                binding.placeholderText.text = getString(R.string.no_internet)
+                binding.placeholderText.visibility = View.VISIBLE
+
+                binding.placeholderImage.setImageResource(R.drawable.no_internet)
+                binding.placeholderImage.visibility = View.VISIBLE
+
+                binding.placeholderUpdateButton.visibility = View.VISIBLE
             }
         }
     }
@@ -157,6 +172,7 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         const val SEARCH_TEXT = "SEARCH_TEXT"
         const val SEARCH_DEF = ""
+
     }
 
     enum class SearchStatus {
