@@ -3,6 +3,8 @@
     <dimen name="large_text_size">22sp</dimen>
     <dimen name="normal_text_size">16sp</dimen>
     <dimen name="small_text_size">11sp</dimen>
+    <dimen name="placeholder_text_size">19sp</dimen>
+
     <dimen name="main_corner_radius_btn">16dp</dimen>
     <dimen name="main_icon_padding">8dp</dimen>
     <dimen name="search_end_icon_padding">32dp</dimen>
