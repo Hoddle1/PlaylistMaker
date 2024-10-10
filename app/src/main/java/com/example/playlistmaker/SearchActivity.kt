@@ -2,7 +2,6 @@ package com.example.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
