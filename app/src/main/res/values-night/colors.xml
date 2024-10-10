@@ -15,4 +15,5 @@
     <color name="update_search_btn_background">#FFFFFF</color>
     <color name="update_search_btn_text">#1A1B22</color>
     <color name="placeholder_image_color">#FFFFFF</color>
+    <color name="history_text_color">#FFFFFF</color>
 </resources>

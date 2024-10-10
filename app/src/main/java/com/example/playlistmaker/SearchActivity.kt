@@ -2,7 +2,7 @@ package com.example.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
@@ -13,25 +13,37 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private var searchText: String = SEARCH_DEF
-    private val tracks = ArrayList<Track>()
+
+    private var searchText: String = ""
+
+    private val tracks: MutableList<Track> = mutableListOf()
+    private val tracksHistory: MutableList<Track> = mutableListOf()
+    private val trackHistoryAdapter = TrackAdapter(tracksHistory)
+
     private val trackAdapter = TrackAdapter(tracks)
 
+
     private val iTunesBaseUrl = "https://itunes.apple.com"
+
     private val retrofit = Retrofit.Builder()
         .baseUrl(iTunesBaseUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
     private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,38 +61,73 @@ class SearchActivity : AppCompatActivity() {
 
         binding.back.setOnClickListener { finish() }
 
+        trackAdapter.onItemClickListener = { track ->
+            addTrackHistory(track)
+        }
+        trackHistoryAdapter.onItemClickListener = { track ->
+            addTrackHistory(track)
+        }
+
         binding.clearIcon.setOnClickListener {
             clearSearchText()
+            binding.tracksList.isVisible = false
             tracks.clear()
             trackAdapter.notifyDataSetChanged()
         }
 
+        binding.queryInput.setOnFocusChangeListener { view, hasFocus ->
+            tracksHistory.clear()
+            tracksHistory.addAll(getTrackHistory())
+            trackHistoryAdapter.notifyDataSetChanged()
+            binding.trackHistoryContainer.isVisible =
+                hasFocus && binding.queryInput.text.isEmpty() && tracksHistory.isNotEmpty()
+        }
+
+
         if (savedInstanceState != null) {
-            searchText = savedInstanceState.getString(SEARCH_TEXT, SEARCH_DEF)
+            searchText = savedInstanceState.getString(SEARCH_TEXT, "")
             binding.queryInput.setText(searchText)
         }
 
-        binding.placeholderUpdateButton.setOnClickListener{
+        binding.placeholderUpdateButton.setOnClickListener {
             search()
         }
 
         binding.queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 search()
-                true
             }
             false
         }
 
-        binding.queryInput.doOnTextChanged { s, _, _, _ ->
-            binding.clearIcon.isVisible = !s.isNullOrEmpty()
-            searchText = s.toString()
+        binding.clearHistoryButton.setOnClickListener {
+            binding.trackHistoryContainer.isVisible = false
+            tracksHistory.clear()
+            trackHistoryAdapter.notifyDataSetChanged()
+            clearTrackHistory()
+
         }
 
+        binding.queryInput.doOnTextChanged { s, _, _, _ ->
+            binding.clearIcon.isVisible = !s.isNullOrEmpty()
+            if (s?.isEmpty() == true) {
+                binding.placeholderText.isVisible = false
+                binding.placeholderImage.isVisible = false
+                binding.placeholderUpdateButton.isVisible = false
+            }
+            searchText = s.toString()
+            binding.trackHistoryContainer.isVisible =
+                (binding.queryInput.hasFocus() && s?.isEmpty() == true && tracksHistory.isNotEmpty())
+        }
 
         binding.tracksList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.tracksList.adapter = trackAdapter
+
+
+        binding.historyList.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.historyList.adapter = trackHistoryAdapter
 
     }
 
@@ -103,7 +150,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        searchText = savedInstanceState.getString(SEARCH_TEXT, SEARCH_DEF)
+        searchText = savedInstanceState.getString(SEARCH_TEXT, "")
     }
 
     private fun search() {
@@ -139,40 +186,88 @@ class SearchActivity : AppCompatActivity() {
     private fun showMessage(status: SearchStatus) {
         when (status) {
             SearchStatus.NORMAL -> {
-                binding.tracksList.visibility = View.VISIBLE
-                binding.placeholderText.visibility = View.GONE
-                binding.placeholderImage.visibility = View.GONE
-                binding.placeholderUpdateButton.visibility = View.GONE
+                binding.tracksList.isVisible = true
+                binding.placeholderText.isVisible = false
+                binding.placeholderImage.isVisible = false
+                binding.placeholderUpdateButton.isVisible = false
             }
 
             SearchStatus.NOT_FOUND -> {
-                binding.tracksList.visibility = View.GONE
+                binding.tracksList.isVisible = false
                 binding.placeholderText.text = getString(R.string.not_found)
-                binding.placeholderText.visibility = View.VISIBLE
-
+                binding.placeholderText.isVisible = true
                 binding.placeholderImage.setImageResource(R.drawable.not_found)
-                binding.placeholderImage.visibility = View.VISIBLE
-
-                binding.placeholderUpdateButton.visibility = View.GONE
+                binding.placeholderImage.isVisible = true
+                binding.placeholderUpdateButton.isVisible = false
             }
 
             SearchStatus.NO_INTERNET -> {
-                binding.tracksList.visibility = View.GONE
+                binding.tracksList.isVisible = false
                 binding.placeholderText.text = getString(R.string.no_internet)
-                binding.placeholderText.visibility = View.VISIBLE
-
+                binding.placeholderText.isVisible = true
                 binding.placeholderImage.setImageResource(R.drawable.no_internet)
-                binding.placeholderImage.visibility = View.VISIBLE
-
-                binding.placeholderUpdateButton.visibility = View.VISIBLE
+                binding.placeholderImage.isVisible = true
+                binding.placeholderUpdateButton.isVisible = true
             }
         }
     }
 
+    private fun clearTrackHistory() {
+        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        sharedPrefs.edit()
+            .remove("search_history")
+            .apply()
+    }
+
+    private fun addTrackHistory(track: Track) {
+        val history = getTrackHistory()
+
+        if (history.contains(track)) {
+            history.remove(track)
+        } else if (history.size >= HISTORY_LIMIT) {
+            history.removeLast()
+        }
+
+        history.add(0, track)
+
+        val gson = GsonBuilder()
+            .setPrettyPrinting()
+            .create()
+
+        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+
+        val historyJson = gson.toJson(history)
+
+        sharedPrefs.edit()
+            .putString("search_history", historyJson)
+            .apply()
+
+    }
+
+    private fun getTrackHistory(): MutableList<Track> {
+        val gson = GsonBuilder()
+            .setPrettyPrinting()
+            .create()
+
+        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+
+        val history: MutableList<Track>
+
+        val json = sharedPrefs.getString("search_history", null)
+
+        if (json == null) {
+            history = mutableListOf()
+        } else {
+            val itemType = object : TypeToken<MutableList<Track>>() {}.type
+            history = gson.fromJson(json, itemType)
+        }
+
+        return history
+    }
+
     companion object {
         const val SEARCH_TEXT = "SEARCH_TEXT"
-        const val SEARCH_DEF = ""
-
+        const val HISTORY_LIMIT = 10
     }
 
     enum class SearchStatus {

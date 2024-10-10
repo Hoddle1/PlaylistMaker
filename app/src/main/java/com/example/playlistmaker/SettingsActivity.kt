@@ -15,6 +15,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,6 +34,16 @@ class SettingsActivity : AppCompatActivity() {
         val backBtn = findViewById<ImageButton>(R.id.back)
         backBtn.setOnClickListener {
             finish()
+        }
+        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+        val darkTheme = sharedPrefs.getBoolean("dark_theme", false)
+        binding.themeSwitcher.setChecked(darkTheme)
+
+        binding.themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            sharedPrefs.edit()
+                .putBoolean("dark_theme", switcher.isChecked)
+                .apply()
+            (applicationContext as App).switchTheme(checked)
         }
 
         binding.shareApp.setOnClickListener {

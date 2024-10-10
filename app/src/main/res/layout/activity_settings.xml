@@ -40,6 +40,7 @@
         android:orientation="vertical">
 
         <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/themeSwitcher"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:fontFamily="@font/ys_display_regular"
