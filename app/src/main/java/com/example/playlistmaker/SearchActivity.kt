@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -45,6 +46,7 @@ class SearchActivity : AppCompatActivity() {
     private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
 
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -75,7 +77,7 @@ class SearchActivity : AppCompatActivity() {
             trackAdapter.notifyDataSetChanged()
         }
 
-        binding.queryInput.setOnFocusChangeListener { view, hasFocus ->
+        binding.queryInput.setOnFocusChangeListener { _, hasFocus ->
             tracksHistory.clear()
             tracksHistory.addAll(getTrackHistory())
             trackHistoryAdapter.notifyDataSetChanged()
@@ -159,6 +161,7 @@ class SearchActivity : AppCompatActivity() {
     private fun search() {
         iTunesService.search(binding.queryInput.text.toString())
             .enqueue(object : Callback<TrackResponse> {
+                @SuppressLint("NotifyDataSetChanged")
                 override fun onResponse(
                     call: Call<TrackResponse>,
                     response: Response<TrackResponse>
