@@ -18,7 +18,7 @@
     <string name="empty_string" />
     <string name="track_image">Обложка трека</string>
     <string name="go_over">Перейти</string>
-    <string name="track_author">LINKIN PARK</string>
+    <string name="track_author">Очень длинное имя артиста, да такое что вылазит за границы экрана</string>
     <string name="track_timing">2:55</string>
     <string name="track_name">POWERLESS</string>
     <string name="update">Обновить</string>

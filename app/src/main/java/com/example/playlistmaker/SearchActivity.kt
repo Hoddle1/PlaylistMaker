@@ -2,6 +2,7 @@ package com.example.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
@@ -83,8 +84,8 @@ class SearchActivity : AppCompatActivity() {
         }
 
 
-        if (savedInstanceState != null) {
-            searchText = savedInstanceState.getString(SEARCH_TEXT, "")
+        savedInstanceState?.let {
+            searchText = it.getString(SEARCH_TEXT, "")
             binding.queryInput.setText(searchText)
         }
 
@@ -110,13 +111,16 @@ class SearchActivity : AppCompatActivity() {
         binding.queryInput.doOnTextChanged { s, _, _, _ ->
             binding.clearIcon.isVisible = !s.isNullOrEmpty()
             if (s?.isEmpty() == true) {
-                binding.placeholderText.isVisible = false
-                binding.placeholderImage.isVisible = false
-                binding.placeholderUpdateButton.isVisible = false
+                hidePlaceholder()
             }
             searchText = s.toString()
             binding.trackHistoryContainer.isVisible =
                 (binding.queryInput.hasFocus() && s?.isEmpty() == true && tracksHistory.isNotEmpty())
+
+            if(s?.isEmpty() == true){
+                binding.tracksList.isVisible = false
+            }
+
         }
 
         binding.tracksList.layoutManager =
@@ -171,12 +175,16 @@ class SearchActivity : AppCompatActivity() {
                             }
                         }
 
-                        else -> showMessage(SearchStatus.NO_INTERNET)
+                        else -> {
+                            Log.d("asd", response.code().toString())
+                            showMessage(SearchStatus.NO_INTERNET)
+                        }
                     }
 
                 }
 
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+
                     showMessage(SearchStatus.NO_INTERNET)
                 }
             })
@@ -186,9 +194,7 @@ class SearchActivity : AppCompatActivity() {
         when (status) {
             SearchStatus.NORMAL -> {
                 binding.tracksList.isVisible = true
-                binding.placeholderText.isVisible = false
-                binding.placeholderImage.isVisible = false
-                binding.placeholderUpdateButton.isVisible = false
+                hidePlaceholder()
             }
 
             SearchStatus.NOT_FOUND -> {
@@ -198,6 +204,7 @@ class SearchActivity : AppCompatActivity() {
                 binding.placeholderImage.setImageResource(R.drawable.not_found)
                 binding.placeholderImage.isVisible = true
                 binding.placeholderUpdateButton.isVisible = false
+                binding.trackHistoryContainer.isVisible = false
             }
 
             SearchStatus.NO_INTERNET -> {
@@ -207,6 +214,7 @@ class SearchActivity : AppCompatActivity() {
                 binding.placeholderImage.setImageResource(R.drawable.no_internet)
                 binding.placeholderImage.isVisible = true
                 binding.placeholderUpdateButton.isVisible = true
+                binding.trackHistoryContainer.isVisible = false
             }
         }
     }
@@ -262,6 +270,12 @@ class SearchActivity : AppCompatActivity() {
         }
 
         return history
+    }
+
+    private fun hidePlaceholder(){
+        binding.placeholderText.isVisible = false
+        binding.placeholderImage.isVisible = false
+        binding.placeholderUpdateButton.isVisible = false
     }
 
     companion object {
