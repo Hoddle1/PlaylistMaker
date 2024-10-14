@@ -13,14 +13,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.playlistmaker.RetrofitClient.getClient
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
 class SearchActivity : AppCompatActivity() {
@@ -38,10 +37,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val iTunesBaseUrl = "https://itunes.apple.com"
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(iTunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    private val retrofit = getClient(iTunesBaseUrl)
 
     private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
 
@@ -138,14 +134,6 @@ class SearchActivity : AppCompatActivity() {
 
     private fun clearSearchText() {
         binding.queryInput.setText(R.string.empty_string)
-        binding.queryInput.clearFocus()
-        hideKeyboard()
-    }
-
-    private fun hideKeyboard() {
-        val inputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(binding.queryInput.windowToken, 0)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
