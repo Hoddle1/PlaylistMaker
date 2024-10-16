@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -39,22 +40,28 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
+        val sharedPrefs: SharedPreferences =
+            getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
+
         when (AppCompatDelegate.getDefaultNightMode()) {
             AppCompatDelegate.MODE_NIGHT_NO -> {
                 binding.themeSwitcher.isChecked = false
             }
+
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> {
-                val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                binding.themeSwitcher.isChecked = currentNightMode == Configuration.UI_MODE_NIGHT_YES
+                val currentNightMode =
+                    resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                binding.themeSwitcher.isChecked =
+                    currentNightMode == Configuration.UI_MODE_NIGHT_YES
             }
+
             AppCompatDelegate.MODE_NIGHT_YES -> {
                 binding.themeSwitcher.isChecked = true
             }
         }
-
-        val sharedPrefs: SharedPreferences = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
-
+        binding.themeSwitcher.isSaveEnabled = false
+        binding.themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            Log.d("CheckedChange", "YES")
             val newTheme = if (checked) {
                 Constants.DARK_THEME
             } else {
@@ -66,6 +73,7 @@ class SettingsActivity : AppCompatActivity() {
                 .apply()
 
             (applicationContext as App).switchTheme(newTheme)
+
         }
 
         binding.shareApp.setOnClickListener {
@@ -91,5 +99,8 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-
+//    override fun onResume() {
+//        super.onResume()
+//
+//    }
 }

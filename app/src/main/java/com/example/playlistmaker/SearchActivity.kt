@@ -1,11 +1,9 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -61,9 +59,15 @@ class SearchActivity : AppCompatActivity() {
 
         trackAdapter.onItemClickListener = { track ->
             addTrackHistory(track)
+            tracksHistory.clear()
+            tracksHistory.addAll(getTrackHistory())
+            trackHistoryAdapter.notifyDataSetChanged()
         }
         trackHistoryAdapter.onItemClickListener = { track ->
             addTrackHistory(track)
+            tracksHistory.clear()
+            tracksHistory.addAll(getTrackHistory())
+            trackHistoryAdapter.notifyDataSetChanged()
         }
 
         binding.clearIcon.setOnClickListener {
@@ -217,7 +221,7 @@ class SearchActivity : AppCompatActivity() {
             .apply()
     }
 
-    private fun addTrackHistory(track: Track) {
+    private fun addTrackHistory(track: Track){
         val history = getTrackHistory()
 
         if (history.contains(track)) {
