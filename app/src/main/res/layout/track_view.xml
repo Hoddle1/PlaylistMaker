@@ -9,7 +9,9 @@
     android:orientation="horizontal"
     android:paddingHorizontal="12dp"
     android:paddingVertical="8dp"
-    android:showDividers="middle">
+    android:showDividers="middle"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/track_logo"
@@ -34,12 +36,13 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_gravity="start">
+            android:orientation="horizontal"
+            android:layout_gravity="start">
 
             <TextView
                 android:id="@+id/artist_name"
                 style="@style/TrackDescription"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 tools:text="@string/track_author" />

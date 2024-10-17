@@ -68,4 +68,9 @@
         <item name="android:paddingVertical">4dp</item>
         <item name="android:paddingHorizontal">6dp</item>
     </style>
+
+    <style name="ClearHistoryButton" parent="UpdateSearchButton">
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:paddingHorizontal">14dp</item>
+    </style>
 </resources>

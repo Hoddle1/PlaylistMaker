@@ -1,6 +1,5 @@
 package com.example.playlistmaker
 
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,8 +18,6 @@ class TracksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(model: Track) {
         trackName.text = model.trackName
         artistName.text = model.artistName
-        Log.d("trackName", model.trackName)
-        Log.d("artistName", model.artistName)
         trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
         Glide.with(itemView)
             .load(model.artworkUrl100)
@@ -29,6 +26,8 @@ class TracksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .centerCrop()
             .transform(RoundedCorners(Utils.dpToPx(2f, itemView.context)))
             .into(trackLogo)
+
+
     }
 
 

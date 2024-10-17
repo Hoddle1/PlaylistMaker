@@ -18,10 +18,12 @@
     <string name="empty_string" />
     <string name="track_image">Обложка трека</string>
     <string name="go_over">Перейти</string>
-    <string name="track_author">LINKIN PARK</string>
+    <string name="track_author">Очень длинное имя артиста, да такое что вылазит за границы экрана</string>
     <string name="track_timing">2:55</string>
     <string name="track_name">POWERLESS</string>
     <string name="update">Обновить</string>
     <string name="not_found">Ничего не нашлось</string>
     <string name="no_internet">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="search_history">Вы искали</string>
+    <string name="clear_history">Очистить историю</string>
 </resources>
