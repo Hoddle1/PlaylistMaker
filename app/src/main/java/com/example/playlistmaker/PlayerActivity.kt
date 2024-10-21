@@ -56,8 +56,10 @@ class PlayerActivity : AppCompatActivity() {
                     .apply {
                         time = track.releaseDate
                     }.get(Calendar.YEAR).toString()
-            trackGenreValue.text = track.primaryGenreName
+
+            genreValue.text = track.primaryGenreName
             countryValue.text = track.country
+
             Glide.with(this@PlayerActivity)
                 .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
                 .fitCenter()
