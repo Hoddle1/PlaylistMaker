@@ -11,7 +11,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.Utils.convertMillisToTime
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class PlayerActivity : AppCompatActivity() {
@@ -36,9 +37,9 @@ class PlayerActivity : AppCompatActivity() {
         binding.back.setOnClickListener { finish() }
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            intent.getSerializableExtra(Constants.TRACK_DATA, Track::class.java)!!
+            intent.getParcelableExtra(Constants.TRACK_DATA, Track::class.java)!!
         else
-            intent.getSerializableExtra(Constants.TRACK_DATA) as Track
+            (intent.getParcelableExtra(Constants.TRACK_DATA) as? Track)!!
 
         with(binding) {
             textView.text = track.trackName
@@ -52,10 +53,7 @@ class PlayerActivity : AppCompatActivity() {
             }
 
             releaseDateValue.text =
-                Calendar.getInstance()
-                    .apply {
-                        time = track.releaseDate
-                    }.get(Calendar.YEAR).toString()
+                SimpleDateFormat("yyyy", Locale.getDefault()).format(track.releaseDate)
 
             genreValue.text = track.primaryGenreName
             countryValue.text = track.country

@@ -1,8 +1,10 @@
 package com.example.playlistmaker
 
-import java.io.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.Date
 
+@Parcelize
 data class Track(
     val trackId: Int, //идентификатор трека
     val trackName: String, // Название композиции
@@ -13,7 +15,7 @@ data class Track(
     val releaseDate: Date, // Год релиза трека
     val primaryGenreName: String, // Жанр трека
     val country: String // Страна исполнителя
-) : Serializable {
+) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

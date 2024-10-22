@@ -127,7 +127,7 @@
             android:fontFamily="@font/ys_display_medium"
             android:gravity="center_horizontal"
             android:text="@string/placeholderCurrentTrack"
-            android:textColor="@color/main_text"
+            android:textColor="@color/track_content_value"
             android:textFontWeight="500"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@id/play"
