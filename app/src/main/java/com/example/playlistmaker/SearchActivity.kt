@@ -3,8 +3,9 @@ package com.example.playlistmaker
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import android.view.inputmethod.EditorInfo
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -40,6 +41,23 @@ class SearchActivity : AppCompatActivity() {
 
     private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
 
+    private var isClickAllowed = true
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val searchRunnable = Runnable { search() }
+
+    companion object {
+        private const val SEARCH_TEXT = "SEARCH_TEXT"
+        private const val HISTORY_LIMIT = 10
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+    }
+
+    enum class SearchStatus {
+        NORMAL, NOT_FOUND, NO_INTERNET
+    }
+
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,15 +77,18 @@ class SearchActivity : AppCompatActivity() {
         binding.back.setOnClickListener { finish() }
 
         trackAdapter.onItemClickListener = { track ->
-            addTrackHistory(track)
-            startPlayerActivity(track)
-            updateTrackHistoryList()
-
+            if (clickDebounce()) {
+                addTrackHistory(track)
+                startPlayerActivity(track)
+                updateTrackHistoryList()
+            }
         }
         trackHistoryAdapter.onItemClickListener = { track ->
-            addTrackHistory(track)
-            startPlayerActivity(track)
-            updateTrackHistoryList()
+            if (clickDebounce()) {
+                addTrackHistory(track)
+                startPlayerActivity(track)
+                updateTrackHistoryList()
+            }
         }
 
         binding.clearIcon.setOnClickListener {
@@ -93,13 +114,6 @@ class SearchActivity : AppCompatActivity() {
             search()
         }
 
-        binding.queryInput.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                search()
-            }
-            false
-        }
-
         binding.clearHistoryButton.setOnClickListener {
             binding.trackHistoryContainer.isVisible = false
             tracksHistory.clear()
@@ -109,17 +123,16 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.queryInput.doOnTextChanged { s, _, _, _ ->
+            searchDebounce()
             binding.clearIcon.isVisible = !s.isNullOrEmpty()
             if (s?.isEmpty() == true) {
                 hidePlaceholder()
+                binding.tracksList.isVisible = false
             }
             searchText = s.toString()
             binding.trackHistoryContainer.isVisible =
                 (binding.queryInput.hasFocus() && s?.isEmpty() == true && tracksHistory.isNotEmpty())
 
-            if(s?.isEmpty() == true){
-                binding.tracksList.isVisible = false
-            }
 
         }
 
@@ -155,41 +168,49 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun search() {
-        iTunesService.search(binding.queryInput.text.toString())
-            .enqueue(object : Callback<TrackResponse> {
-                @SuppressLint("NotifyDataSetChanged")
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    when (response.code()) {
-                        200 -> {
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                tracks.clear()
-                                tracks.addAll(response.body()?.results!!)
-                                trackAdapter.notifyDataSetChanged()
-                                showMessage(SearchStatus.NORMAL)
-                            } else {
-                                showMessage(SearchStatus.NOT_FOUND)
+        if (binding.queryInput.text.toString().isNotEmpty()) {
+            hidePlaceholder()
+            binding.tracksList.isVisible = false
+            binding.trackHistoryContainer.isVisible = false
+            binding.progressContainer.isVisible = true
+
+            iTunesService.search(binding.queryInput.text.toString())
+                .enqueue(object : Callback<TrackResponse> {
+                    @SuppressLint("NotifyDataSetChanged")
+                    override fun onResponse(
+                        call: Call<TrackResponse>,
+                        response: Response<TrackResponse>
+                    ) {
+                        when (response.code()) {
+                            200 -> {
+                                if (response.body()?.results?.isNotEmpty() == true) {
+                                    tracks.clear()
+                                    tracks.addAll(response.body()?.results!!)
+                                    trackAdapter.notifyDataSetChanged()
+                                    showMessage(SearchStatus.NORMAL)
+                                } else {
+                                    showMessage(SearchStatus.NOT_FOUND)
+                                }
+                            }
+
+                            else -> {
+                                Log.d("asd", response.code().toString())
+                                showMessage(SearchStatus.NO_INTERNET)
                             }
                         }
 
-                        else -> {
-                            Log.d("asd", response.code().toString())
-                            showMessage(SearchStatus.NO_INTERNET)
-                        }
                     }
 
-                }
+                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
 
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-
-                    showMessage(SearchStatus.NO_INTERNET)
-                }
-            })
+                        showMessage(SearchStatus.NO_INTERNET)
+                    }
+                })
+        }
     }
 
     private fun showMessage(status: SearchStatus) {
+        binding.progressContainer.isVisible = false
         when (status) {
             SearchStatus.NORMAL -> {
                 binding.tracksList.isVisible = true
@@ -197,6 +218,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             SearchStatus.NOT_FOUND -> {
+                binding.placeholderContainer.isVisible = true
                 binding.tracksList.isVisible = false
                 binding.placeholderText.text = getString(R.string.not_found)
                 binding.placeholderText.isVisible = true
@@ -207,6 +229,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             SearchStatus.NO_INTERNET -> {
+                binding.placeholderContainer.isVisible = true
                 binding.tracksList.isVisible = false
                 binding.placeholderText.text = getString(R.string.no_internet)
                 binding.placeholderText.isVisible = true
@@ -225,7 +248,7 @@ class SearchActivity : AppCompatActivity() {
             .apply()
     }
 
-    private fun addTrackHistory(track: Track){
+    private fun addTrackHistory(track: Track) {
         val history = getTrackHistory()
 
         if (history.contains(track)) {
@@ -278,19 +301,26 @@ class SearchActivity : AppCompatActivity() {
         trackHistoryAdapter.notifyDataSetChanged()
     }
 
-    private fun hidePlaceholder(){
+    private fun hidePlaceholder() {
+        binding.placeholderContainer.isVisible = false
         binding.placeholderText.isVisible = false
         binding.placeholderImage.isVisible = false
         binding.placeholderUpdateButton.isVisible = false
     }
 
-    companion object {
-        const val SEARCH_TEXT = "SEARCH_TEXT"
-        const val HISTORY_LIMIT = 10
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
 
-    enum class SearchStatus {
-        NORMAL, NOT_FOUND, NO_INTERNET
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
+
 
 }

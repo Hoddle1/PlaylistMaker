@@ -14,7 +14,8 @@ data class Track(
     var collectionName: String?, // Название альбома
     val releaseDate: Date, // Год релиза трека
     val primaryGenreName: String, // Жанр трека
-    val country: String // Страна исполнителя
+    val country: String, // Страна исполнителя
+    val previewUrl: String // Ссылка на отрывок трека
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -101,10 +101,12 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="30dp"
-            android:background="@drawable/play_button"
+            android:backgroundTint="@color/transparent"
+            android:enabled="false"
             android:contentDescription="@string/play"
             app:layout_constraintEnd_toStartOf="@id/favorite"
             app:layout_constraintStart_toEndOf="@id/queue"
+            android:src="@drawable/play_button"
             app:layout_constraintTop_toBottomOf="@+id/artistName" />
 
         <ImageButton
