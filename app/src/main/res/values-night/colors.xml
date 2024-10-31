@@ -16,4 +16,6 @@
     <color name="update_search_btn_text">#1A1B22</color>
     <color name="placeholder_image_color">#FFFFFF</color>
     <color name="history_text_color">#FFFFFF</color>
+    <color name="track_content_value">#FFFFFF</color>
+    <color name="background_player_button">#FFFFFF</color>
 </resources>

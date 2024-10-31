@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.EditorInfo
@@ -59,15 +60,14 @@ class SearchActivity : AppCompatActivity() {
 
         trackAdapter.onItemClickListener = { track ->
             addTrackHistory(track)
-            tracksHistory.clear()
-            tracksHistory.addAll(getTrackHistory())
-            trackHistoryAdapter.notifyDataSetChanged()
+            startPlayerActivity(track)
+            updateTrackHistoryList()
+
         }
         trackHistoryAdapter.onItemClickListener = { track ->
             addTrackHistory(track)
-            tracksHistory.clear()
-            tracksHistory.addAll(getTrackHistory())
-            trackHistoryAdapter.notifyDataSetChanged()
+            startPlayerActivity(track)
+            updateTrackHistoryList()
         }
 
         binding.clearIcon.setOnClickListener {
@@ -78,9 +78,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.queryInput.setOnFocusChangeListener { _, hasFocus ->
-            tracksHistory.clear()
-            tracksHistory.addAll(getTrackHistory())
-            trackHistoryAdapter.notifyDataSetChanged()
+            updateTrackHistoryList()
             binding.trackHistoryContainer.isVisible =
                 hasFocus && binding.queryInput.text.isEmpty() && tracksHistory.isNotEmpty()
         }
@@ -134,6 +132,12 @@ class SearchActivity : AppCompatActivity() {
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.historyList.adapter = trackHistoryAdapter
 
+    }
+
+    private fun startPlayerActivity(track: Track) {
+        val intent = Intent(this, PlayerActivity::class.java)
+        intent.putExtra(Constants.TRACK_DATA, track)
+        startActivity(intent)
     }
 
     private fun clearSearchText() {
@@ -265,6 +269,13 @@ class SearchActivity : AppCompatActivity() {
         }
 
         return history
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun updateTrackHistoryList() {
+        tracksHistory.clear()
+        tracksHistory.addAll(getTrackHistory())
+        trackHistoryAdapter.notifyDataSetChanged()
     }
 
     private fun hidePlaceholder(){

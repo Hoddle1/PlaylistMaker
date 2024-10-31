@@ -73,4 +73,23 @@
         <item name="android:paddingVertical">10dp</item>
         <item name="android:paddingHorizontal">14dp</item>
     </style>
+
+    <style name="TrackContentTitle">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textColor">@color/track_content_title</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:lineHeight">15dp</item>
+        <item name="android:textSize">@dimen/content_title_text_size</item>
+    </style>
+
+    <style name="TrackContentValue">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textColor">@color/track_content_value</item>
+        <item name="android:layout_marginTop">@dimen/track_content_vertical_margin</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:lineHeight">15dp</item>
+        <item name="android:textSize">@dimen/content_title_text_size</item>
+        <item name="android:gravity">end</item>
+    </style>
+
 </resources>

@@ -26,4 +26,14 @@
     <string name="no_internet">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="search_history">Вы искали</string>
     <string name="clear_history">Очистить историю</string>
+    <string name="add_to_favorite">Добавить в любимое</string>
+    <string name="play">Начать воспроизведение</string>
+    <string name="queue_tracks">Список треков</string>
+    <string name="duration">Длительность</string>
+    <string name="country">Страна</string>
+    <string name="genre">Жанр</string>
+    <string name="year">Год</string>
+    <string name="collection">Альбом</string>
+    <string name="placeholderCurrentTrack">0:00</string>
+    <string name="album_logo">Обложка трека</string>
 </resources>
