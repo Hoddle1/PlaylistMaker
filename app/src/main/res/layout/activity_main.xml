@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
+    android:id="@+id/llMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_activity_background"
@@ -35,7 +35,7 @@
         android:showDividers="middle">
 
         <Button
-            android:id="@+id/search"
+            android:id="@+id/btnSearch"
             style="@style/MainMenuButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             app:icon="@drawable/ic_search_24" />
 
         <Button
-            android:id="@+id/library"
+            android:id="@+id/btnLibrary"
             style="@style/MainMenuButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             app:icon="@drawable/ic_library" />
 
         <Button
-            android:id="@+id/settings"
+            android:id="@+id/btnSettings"
             style="@style/MainMenuButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

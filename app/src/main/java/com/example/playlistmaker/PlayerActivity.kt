@@ -29,15 +29,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private var timerRunnable: Runnable? = null
 
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-        private const val DELAY = 500L
-        private const val INITIAL_TIME_TIMER = 0
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,13 +40,13 @@ class PlayerActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.svMain) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        binding.back.setOnClickListener { finish() }
+        binding.iBtnBack.setOnClickListener { finish() }
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             intent.getParcelableExtra(Constants.TRACK_DATA, Track::class.java)!!
@@ -67,19 +58,19 @@ class PlayerActivity : AppCompatActivity() {
         with(binding) {
             textView.text = track.trackName
             artistName.text = track.artistName
-            durationValue.text = convertMillisToTime(track.trackTimeMillis)
+            tvDurationValue.text = convertMillisToTime(track.trackTimeMillis)
             if (track.collectionName == null) {
-                collectionNameValue.isVisible = false
-                collectionNameTitle.isVisible = false
+                tvCollectionNameValue.isVisible = false
+                tvCollectionNameTitle.isVisible = false
             } else {
-                collectionNameValue.text = track.collectionName
+                tvCollectionNameValue.text = track.collectionName
             }
 
-            releaseDateValue.text =
+            tvReleaseDateValue.text =
                 SimpleDateFormat("yyyy", Locale.getDefault()).format(track.releaseDate)
 
-            genreValue.text = track.primaryGenreName
-            countryValue.text = track.country
+            tvGenreValue.text = track.primaryGenreName
+            tvCountryValue.text = track.country
 
             Glide.with(this@PlayerActivity)
                 .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
@@ -87,10 +78,10 @@ class PlayerActivity : AppCompatActivity() {
                 .placeholder(R.drawable.track_image_placeholder)
                 .centerCrop()
                 .transform(RoundedCorners(Utils.dpToPx(8f, this@PlayerActivity.applicationContext)))
-                .into(cover)
+                .into(ivCover)
 
 
-            play.setOnClickListener {
+            iBtnPlay.setOnClickListener {
                 playbackControl()
             }
         }
@@ -111,27 +102,26 @@ class PlayerActivity : AppCompatActivity() {
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            binding.play.isEnabled = true
+            binding.iBtnPlay.isEnabled = true
             playerState = STATE_PREPARED
         }
         mediaPlayer.setOnCompletionListener {
-            binding.play.setImageResource(R.drawable.play_button)
-            binding.currentTrackTime.text = convertMillisToTime(INITIAL_TIME_TIMER)
+            binding.iBtnPlay.setImageResource(R.drawable.play_button)
+            binding.tvCurrentTrackTime.text = convertMillisToTime(INITIAL_TIME_TIMER_MILLIS)
             stopTimer()
             playerState = STATE_PREPARED
-
         }
     }
 
     private fun startPlayer() {
         mediaPlayer.start()
-        binding.play.setImageResource(R.drawable.stop_button)
+        binding.iBtnPlay.setImageResource(R.drawable.stop_button)
         playerState = STATE_PLAYING
     }
 
     private fun pausePlayer() {
         mediaPlayer.pause()
-        binding.play.setImageResource(R.drawable.play_button)
+        binding.iBtnPlay.setImageResource(R.drawable.play_button)
         playerState = STATE_PAUSED
     }
 
@@ -162,12 +152,22 @@ class PlayerActivity : AppCompatActivity() {
         return object : Runnable {
             override fun run() {
                 if (playerState == STATE_PLAYING) {
-                    binding.currentTrackTime.text = convertMillisToTime(mediaPlayer.currentPosition)
-                    mainThreadHandler?.postDelayed(this, DELAY)
+                    binding.tvCurrentTrackTime.text =
+                        convertMillisToTime(mediaPlayer.currentPosition)
+                    mainThreadHandler?.postDelayed(this, DELAY_MILLIS)
                 }
 
             }
         }
+    }
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+        private const val DELAY_MILLIS = 500L
+        private const val INITIAL_TIME_TIMER_MILLIS = 0
     }
 
 }

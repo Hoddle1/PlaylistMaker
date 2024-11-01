@@ -50,8 +50,8 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_TEXT = "SEARCH_TEXT"
         private const val HISTORY_LIMIT = 10
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
     }
 
     enum class SearchStatus {
@@ -68,13 +68,13 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.llMain) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        binding.back.setOnClickListener { finish() }
+        binding.iBtnBack.setOnClickListener { finish() }
 
         trackAdapter.onItemClickListener = { track ->
             if (clickDebounce()) {
@@ -110,7 +110,7 @@ class SearchActivity : AppCompatActivity() {
             binding.queryInput.setText(searchText)
         }
 
-        binding.placeholderUpdateButton.setOnClickListener {
+        binding.btnPlaceholder.setOnClickListener {
             search()
         }
 
@@ -218,24 +218,24 @@ class SearchActivity : AppCompatActivity() {
             }
 
             SearchStatus.NOT_FOUND -> {
-                binding.placeholderContainer.isVisible = true
+                binding.llPlaceholder.isVisible = true
                 binding.tracksList.isVisible = false
-                binding.placeholderText.text = getString(R.string.not_found)
-                binding.placeholderText.isVisible = true
-                binding.placeholderImage.setImageResource(R.drawable.not_found)
-                binding.placeholderImage.isVisible = true
-                binding.placeholderUpdateButton.isVisible = false
+                binding.tvPlaceholder.text = getString(R.string.not_found)
+                binding.tvPlaceholder.isVisible = true
+                binding.ivPlaceholder.setImageResource(R.drawable.not_found)
+                binding.ivPlaceholder.isVisible = true
+                binding.btnPlaceholder.isVisible = false
                 binding.trackHistoryContainer.isVisible = false
             }
 
             SearchStatus.NO_INTERNET -> {
-                binding.placeholderContainer.isVisible = true
+                binding.llPlaceholder.isVisible = true
                 binding.tracksList.isVisible = false
-                binding.placeholderText.text = getString(R.string.no_internet)
-                binding.placeholderText.isVisible = true
-                binding.placeholderImage.setImageResource(R.drawable.no_internet)
-                binding.placeholderImage.isVisible = true
-                binding.placeholderUpdateButton.isVisible = true
+                binding.tvPlaceholder.text = getString(R.string.no_internet)
+                binding.tvPlaceholder.isVisible = true
+                binding.ivPlaceholder.setImageResource(R.drawable.no_internet)
+                binding.ivPlaceholder.isVisible = true
+                binding.btnPlaceholder.isVisible = true
                 binding.trackHistoryContainer.isVisible = false
             }
         }
@@ -302,24 +302,24 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hidePlaceholder() {
-        binding.placeholderContainer.isVisible = false
-        binding.placeholderText.isVisible = false
-        binding.placeholderImage.isVisible = false
-        binding.placeholderUpdateButton.isVisible = false
+        binding.llPlaceholder.isVisible = false
+        binding.tvPlaceholder.isVisible = false
+        binding.ivPlaceholder.isVisible = false
+        binding.btnPlaceholder.isVisible = false
     }
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY_MILLIS)
         }
         return current
     }
 
     private fun searchDebounce() {
         handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_MILLIS)
     }
 
 

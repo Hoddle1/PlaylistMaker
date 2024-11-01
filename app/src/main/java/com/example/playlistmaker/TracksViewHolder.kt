@@ -9,10 +9,10 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.Utils.convertMillisToTime
 
 class TracksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val trackName: TextView = itemView.findViewById(R.id.track_name)
-    private val artistName: TextView = itemView.findViewById(R.id.artist_name)
-    private val trackTime: TextView = itemView.findViewById(R.id.track_time)
-    private val trackLogo: ImageView = itemView.findViewById(R.id.track_logo)
+    private val trackName: TextView = itemView.findViewById(R.id.tvTrackName)
+    private val artistName: TextView = itemView.findViewById(R.id.tvArtistName)
+    private val trackTime: TextView = itemView.findViewById(R.id.tvTrackTime)
+    private val trackLogo: ImageView = itemView.findViewById(R.id.ivTrackLogo)
 
     fun bind(model: Track) {
         trackName.text = model.trackName

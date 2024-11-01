@@ -6,16 +6,16 @@ import java.util.Date
 
 @Parcelize
 data class Track(
-    val trackId: Int, //идентификатор трека
-    val trackName: String, // Название композиции
-    val artistName: String, // Имя исполнителя
-    val trackTimeMillis: Int, // Продолжительность трека
-    val artworkUrl100: String, // Ссылка на изображение обложки
-    var collectionName: String?, // Название альбома
-    val releaseDate: Date, // Год релиза трека
-    val primaryGenreName: String, // Жанр трека
-    val country: String, // Страна исполнителя
-    val previewUrl: String // Ссылка на отрывок трека
+    val trackId: Int,
+    val trackName: String,
+    val artistName: String,
+    val trackTimeMillis: Int,
+    val artworkUrl100: String,
+    var collectionName: String?,
+    val releaseDate: Date,
+    val primaryGenreName: String,
+    val country: String,
+    val previewUrl: String
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
