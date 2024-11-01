@@ -14,7 +14,7 @@
     android:foreground="?attr/selectableItemBackground">
 
     <ImageView
-        android:id="@+id/track_logo"
+        android:id="@+id/ivTrackLogo"
         android:layout_width="@dimen/track_image_size"
         android:layout_height="@dimen/track_image_size"
         android:contentDescription="@string/track_image"
@@ -27,7 +27,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/track_name"
+            android:id="@+id/tvTrackName"
             style="@style/TrackName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             android:layout_gravity="start">
 
             <TextView
-                android:id="@+id/artist_name"
+                android:id="@+id/tvArtistName"
                 style="@style/TrackDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
                 app:tint="@color/track_artist_text" />
 
             <TextView
-                android:id="@+id/track_time"
+                android:id="@+id/tvTrackTime"
                 style="@style/TrackDescription"
                 android:layout_gravity="start"
                 android:layout_width="wrap_content"

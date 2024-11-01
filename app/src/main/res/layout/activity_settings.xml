@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
+    android:id="@+id/llMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/default_background"
@@ -14,7 +14,7 @@
         android:padding="4dp">
 
         <ImageButton
-            android:id="@+id/back"
+            android:id="@+id/iBtnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
@@ -40,7 +40,7 @@
         android:orientation="vertical">
 
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/themeSwitcher"
+            android:id="@+id/scThemeSwitcher"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:fontFamily="@font/ys_display_regular"
@@ -51,7 +51,7 @@
             android:textSize="16sp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/shareApp"
+            android:id="@+id/mbShareApp"
             style="@style/SettingsMenuItem"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -59,7 +59,7 @@
             app:icon="@drawable/ic_share" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/sendSupport"
+            android:id="@+id/mbSendSupport"
             style="@style/SettingsMenuItem"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -67,11 +67,10 @@
             app:icon="@drawable/ic_support" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/userAgreement"
+            android:id="@+id/mbUserAgreement"
             style="@style/SettingsMenuItem"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-
             android:text="@string/agreement"
             app:icon="@drawable/ic_arrow_forward" />
 

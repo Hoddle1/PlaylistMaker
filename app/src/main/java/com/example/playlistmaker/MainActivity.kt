@@ -22,23 +22,23 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.llMain) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        binding.search.setOnClickListener {
+        binding.btnSearch.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
             startActivity(intent)
         }
 
-        binding.library.setOnClickListener {
+        binding.btnLibrary.setOnClickListener {
             val intent = Intent(this, LibraryActivity::class.java)
             startActivity(intent)
         }
 
-        binding.settings.setOnClickListener {
+        binding.btnSettings.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }

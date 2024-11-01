@@ -1,7 +1,10 @@
 package com.example.playlistmaker
 
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -18,9 +21,18 @@ import java.util.Locale
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
 
+    private var playerState = STATE_DEFAULT
+
+    private var mediaPlayer = MediaPlayer()
+
+    private var mainThreadHandler: Handler? = null
+
+    private var timerRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mainThreadHandler = Handler(Looper.getMainLooper())
 
         enableEdgeToEdge()
 
@@ -28,35 +40,37 @@ class PlayerActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.svMain) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        binding.back.setOnClickListener { finish() }
+        binding.iBtnBack.setOnClickListener { finish() }
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             intent.getParcelableExtra(Constants.TRACK_DATA, Track::class.java)!!
         else
             (intent.getParcelableExtra(Constants.TRACK_DATA) as? Track)!!
 
+        preparePlayer(track.previewUrl)
+
         with(binding) {
             textView.text = track.trackName
             artistName.text = track.artistName
-            durationValue.text = convertMillisToTime(track.trackTimeMillis)
+            tvDurationValue.text = convertMillisToTime(track.trackTimeMillis)
             if (track.collectionName == null) {
-                collectionNameValue.isVisible = false
-                collectionNameTitle.isVisible = false
+                tvCollectionNameValue.isVisible = false
+                tvCollectionNameTitle.isVisible = false
             } else {
-                collectionNameValue.text = track.collectionName
+                tvCollectionNameValue.text = track.collectionName
             }
 
-            releaseDateValue.text =
+            tvReleaseDateValue.text =
                 SimpleDateFormat("yyyy", Locale.getDefault()).format(track.releaseDate)
 
-            genreValue.text = track.primaryGenreName
-            countryValue.text = track.country
+            tvGenreValue.text = track.primaryGenreName
+            tvCountryValue.text = track.country
 
             Glide.with(this@PlayerActivity)
                 .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
@@ -64,7 +78,96 @@ class PlayerActivity : AppCompatActivity() {
                 .placeholder(R.drawable.track_image_placeholder)
                 .centerCrop()
                 .transform(RoundedCorners(Utils.dpToPx(8f, this@PlayerActivity.applicationContext)))
-                .into(cover)
+                .into(ivCover)
+
+
+            iBtnPlay.setOnClickListener {
+                playbackControl()
+            }
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopTimer()
+        mediaPlayer.release()
+    }
+
+    private fun preparePlayer(url: String) {
+        mediaPlayer.setDataSource(url)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            binding.iBtnPlay.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            binding.iBtnPlay.setImageResource(R.drawable.play_button)
+            binding.tvCurrentTrackTime.text = convertMillisToTime(INITIAL_TIME_TIMER_MILLIS)
+            stopTimer()
+            playerState = STATE_PREPARED
+        }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        binding.iBtnPlay.setImageResource(R.drawable.stop_button)
+        playerState = STATE_PLAYING
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        binding.iBtnPlay.setImageResource(R.drawable.play_button)
+        playerState = STATE_PAUSED
+    }
+
+    private fun playbackControl() {
+        when (playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+                stopTimer()
+            }
+
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+                startTimer()
+            }
+        }
+    }
+
+    private fun startTimer() {
+        timerRunnable = createUpdateTimerTask()
+        mainThreadHandler?.post(timerRunnable!!)
+    }
+
+    private fun stopTimer() {
+        timerRunnable?.let { mainThreadHandler?.removeCallbacks(it) }
+    }
+
+    private fun createUpdateTimerTask(): Runnable {
+        return object : Runnable {
+            override fun run() {
+                if (playerState == STATE_PLAYING) {
+                    binding.tvCurrentTrackTime.text =
+                        convertMillisToTime(mediaPlayer.currentPosition)
+                    mainThreadHandler?.postDelayed(this, DELAY_MILLIS)
+                }
+
+            }
+        }
+    }
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+        private const val DELAY_MILLIS = 500L
+        private const val INITIAL_TIME_TIMER_MILLIS = 0
+    }
+
 }
