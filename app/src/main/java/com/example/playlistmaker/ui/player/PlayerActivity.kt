@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.player
 
 import android.media.MediaPlayer
 import android.os.Build
@@ -12,8 +12,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.Constants
+import com.example.playlistmaker.R
+import com.example.playlistmaker.Utils
 import com.example.playlistmaker.Utils.convertMillisToTime
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -58,7 +62,7 @@ class PlayerActivity : AppCompatActivity() {
         with(binding) {
             textView.text = track.trackName
             artistName.text = track.artistName
-            tvDurationValue.text = convertMillisToTime(track.trackTimeMillis)
+            tvDurationValue.text = track.trackTimeMillis
             if (track.collectionName == null) {
                 tvCollectionNameValue.isVisible = false
                 tvCollectionNameTitle.isVisible = false

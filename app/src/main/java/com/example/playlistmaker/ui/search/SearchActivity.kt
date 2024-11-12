@@ -1,11 +1,10 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -13,13 +12,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.RetrofitClient.getClient
+import com.example.playlistmaker.Constants
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.PLAYLIST_MAKER_PREFERENCES
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.domain.api.TracksInteractor
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.ui.player.PlayerActivity
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
 class SearchActivity : AppCompatActivity() {
@@ -34,25 +36,11 @@ class SearchActivity : AppCompatActivity() {
 
     private val trackAdapter = TrackAdapter(tracks)
 
-
-    private val iTunesBaseUrl = "https://itunes.apple.com"
-
-    private val retrofit = getClient(iTunesBaseUrl)
-
-    private val iTunesService = retrofit.create(iTunesSearchApi::class.java)
-
     private var isClickAllowed = true
 
     private val handler = Handler(Looper.getMainLooper())
 
     private val searchRunnable = Runnable { search() }
-
-    companion object {
-        private const val SEARCH_TEXT = "SEARCH_TEXT"
-        private const val HISTORY_LIMIT = 10
-        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
-        private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
-    }
 
     enum class SearchStatus {
         NORMAL, NOT_FOUND, NO_INTERNET
@@ -174,38 +162,53 @@ class SearchActivity : AppCompatActivity() {
             binding.trackHistoryContainer.isVisible = false
             binding.progressContainer.isVisible = true
 
-            iTunesService.search(binding.queryInput.text.toString())
-                .enqueue(object : Callback<TrackResponse> {
-                    @SuppressLint("NotifyDataSetChanged")
-                    override fun onResponse(
-                        call: Call<TrackResponse>,
-                        response: Response<TrackResponse>
-                    ) {
-                        when (response.code()) {
-                            200 -> {
-                                if (response.body()?.results?.isNotEmpty() == true) {
-                                    tracks.clear()
-                                    tracks.addAll(response.body()?.results!!)
-                                    trackAdapter.notifyDataSetChanged()
-                                    showMessage(SearchStatus.NORMAL)
-                                } else {
-                                    showMessage(SearchStatus.NOT_FOUND)
-                                }
-                            }
+            val loadTasksUseCase = Creator.provideTracksInteractor()
 
-                            else -> {
-                                Log.d("asd", response.code().toString())
-                                showMessage(SearchStatus.NO_INTERNET)
-                            }
+            loadTasksUseCase.searchTracks(binding.queryInput.text.toString(),
+                object : TracksInteractor.TracksConsumer {
+                    override fun consume(foundTracks: List<Track>) {
+                        if (foundTracks.isNotEmpty()) {
+                            tracks.clear()
+                            tracks.addAll(foundTracks)
+                            trackAdapter.notifyDataSetChanged()
+                            showMessage(SearchStatus.NORMAL)
+                        } else {
+                            showMessage(SearchStatus.NOT_FOUND)
                         }
-
                     }
+                }
+            )
 
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
 
-                        showMessage(SearchStatus.NO_INTERNET)
-                    }
-                })
+//            iTunesService.search(binding.queryInput.text.toString())
+//                .enqueue(object : Callback<TrackSearchResponse> {
+//                    @SuppressLint("NotifyDataSetChanged")
+//                    override fun onResponse(
+//                        call: Call<TrackSearchResponse>,
+//                        response: Response<TrackSearchResponse>
+//                    ) {
+//                        when (response.code()) {
+//                            200 -> {
+//                                if (response.body()?.results?.isNotEmpty() == true) {
+//                                    tracks.clear()
+//                                    tracks.addAll(response.body()?.results!!)
+//                                    trackAdapter.notifyDataSetChanged()
+//                                    showMessage(SearchStatus.NORMAL)
+//                                } else {
+//                                    showMessage(SearchStatus.NOT_FOUND)
+//                                }
+//                            }
+//                            else -> {
+//                                showMessage(SearchStatus.NO_INTERNET)
+//                            }
+//                        }
+//
+//                    }
+//
+//                    override fun onFailure(call: Call<TrackSearchResponse>, t: Throwable) {
+//                        showMessage(SearchStatus.NO_INTERNET)
+//                    }
+//                })
         }
     }
 
@@ -322,5 +325,10 @@ class SearchActivity : AppCompatActivity() {
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_MILLIS)
     }
 
-
+    companion object {
+        private const val SEARCH_TEXT = "SEARCH_TEXT"
+        private const val HISTORY_LIMIT = 10
+        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
+    }
 }

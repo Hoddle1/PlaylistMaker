@@ -1,11 +1,11 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.data.dto
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.util.Date
 
 @Parcelize
-data class Track(
+data class TrackDto(
     val trackId: Int,
     val trackName: String,
     val artistName: String,
@@ -21,7 +21,7 @@ data class Track(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Track
+        other as TrackDto
 
         return trackId == other.trackId
     }
