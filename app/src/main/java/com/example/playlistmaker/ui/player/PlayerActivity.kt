@@ -13,11 +13,12 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.Constants
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.Utils
 import com.example.playlistmaker.Utils.convertMillisToTime
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -27,7 +28,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private var playerState = STATE_DEFAULT
 
-    private var mediaPlayer = MediaPlayer()
+    private val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
 
     private var mainThreadHandler: Handler? = null
 
@@ -63,6 +64,7 @@ class PlayerActivity : AppCompatActivity() {
             textView.text = track.trackName
             artistName.text = track.artistName
             tvDurationValue.text = track.trackTimeMillis
+
             if (track.collectionName == null) {
                 tvCollectionNameValue.isVisible = false
                 tvCollectionNameTitle.isVisible = false
@@ -99,32 +101,33 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopTimer()
-        mediaPlayer.release()
+        mediaPlayerInteractor.releasePlayer()
     }
 
     private fun preparePlayer(url: String) {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            binding.iBtnPlay.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            binding.iBtnPlay.setImageResource(R.drawable.play_button)
-            binding.tvCurrentTrackTime.text = convertMillisToTime(INITIAL_TIME_TIMER_MILLIS)
-            stopTimer()
-            playerState = STATE_PREPARED
-        }
+        mediaPlayerInteractor.preparePlayer(
+            url = url,
+            onPrependListener = {
+                binding.iBtnPlay.isEnabled = true
+                playerState = STATE_PREPARED
+            },
+            onCompletionListener = {
+                binding.iBtnPlay.setImageResource(R.drawable.play_button)
+                binding.tvCurrentTrackTime.text = convertMillisToTime(INITIAL_TIME_TIMER_MILLIS)
+                stopTimer()
+                playerState = STATE_PREPARED
+            }
+        )
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        mediaPlayerInteractor.startPlayer()
         binding.iBtnPlay.setImageResource(R.drawable.stop_button)
         playerState = STATE_PLAYING
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
+        mediaPlayerInteractor.pausePlayer()
         binding.iBtnPlay.setImageResource(R.drawable.play_button)
         playerState = STATE_PAUSED
     }
@@ -156,8 +159,7 @@ class PlayerActivity : AppCompatActivity() {
         return object : Runnable {
             override fun run() {
                 if (playerState == STATE_PLAYING) {
-                    binding.tvCurrentTrackTime.text =
-                        convertMillisToTime(mediaPlayer.currentPosition)
+                    binding.tvCurrentTrackTime.text = mediaPlayerInteractor.getPlayerTime()
                     mainThreadHandler?.postDelayed(this, DELAY_MILLIS)
                 }
 

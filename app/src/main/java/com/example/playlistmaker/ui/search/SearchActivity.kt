@@ -14,14 +14,11 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.Constants
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.PLAYLIST_MAKER_PREFERENCES
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.domain.api.TracksInteractor
-import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.domain.api.TracksSearchInteractor
+import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.ui.player.PlayerActivity
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 
 
 class SearchActivity : AppCompatActivity() {
@@ -32,6 +29,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val tracks: MutableList<Track> = mutableListOf()
     private val tracksHistory: MutableList<Track> = mutableListOf()
+
     private val trackHistoryAdapter = TrackAdapter(tracksHistory)
 
     private val trackAdapter = TrackAdapter(tracks)
@@ -42,10 +40,8 @@ class SearchActivity : AppCompatActivity() {
 
     private val searchRunnable = Runnable { search() }
 
-    enum class SearchStatus {
-        NORMAL, NOT_FOUND, NO_INTERNET
-    }
-
+    private val localHistoryInteractor = Creator.provideTracksHistoryInteractor()
+    private val loadTracksUseCase = Creator.provideTracksSearchInteractor()
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,20 +60,9 @@ class SearchActivity : AppCompatActivity() {
 
         binding.iBtnBack.setOnClickListener { finish() }
 
-        trackAdapter.onItemClickListener = { track ->
-            if (clickDebounce()) {
-                addTrackHistory(track)
-                startPlayerActivity(track)
-                updateTrackHistoryList()
-            }
-        }
-        trackHistoryAdapter.onItemClickListener = { track ->
-            if (clickDebounce()) {
-                addTrackHistory(track)
-                startPlayerActivity(track)
-                updateTrackHistoryList()
-            }
-        }
+        trackAdapter.onItemClickListener = { handleTrackClick(it) }
+
+        trackHistoryAdapter.onItemClickListener = { handleTrackClick(it) }
 
         binding.clearIcon.setOnClickListener {
             clearSearchText()
@@ -92,7 +77,6 @@ class SearchActivity : AppCompatActivity() {
                 hasFocus && binding.queryInput.text.isEmpty() && tracksHistory.isNotEmpty()
         }
 
-
         savedInstanceState?.let {
             searchText = it.getString(SEARCH_TEXT, "")
             binding.queryInput.setText(searchText)
@@ -106,7 +90,7 @@ class SearchActivity : AppCompatActivity() {
             binding.trackHistoryContainer.isVisible = false
             tracksHistory.clear()
             trackHistoryAdapter.notifyDataSetChanged()
-            clearTrackHistory()
+            localHistoryInteractor.clear()
 
         }
 
@@ -120,14 +104,11 @@ class SearchActivity : AppCompatActivity() {
             searchText = s.toString()
             binding.trackHistoryContainer.isVisible =
                 (binding.queryInput.hasFocus() && s?.isEmpty() == true && tracksHistory.isNotEmpty())
-
-
         }
 
         binding.tracksList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.tracksList.adapter = trackAdapter
-
 
         binding.historyList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -162,53 +143,25 @@ class SearchActivity : AppCompatActivity() {
             binding.trackHistoryContainer.isVisible = false
             binding.progressContainer.isVisible = true
 
-            val loadTasksUseCase = Creator.provideTracksInteractor()
-
-            loadTasksUseCase.searchTracks(binding.queryInput.text.toString(),
-                object : TracksInteractor.TracksConsumer {
-                    override fun consume(foundTracks: List<Track>) {
-                        if (foundTracks.isNotEmpty()) {
-                            tracks.clear()
-                            tracks.addAll(foundTracks)
-                            trackAdapter.notifyDataSetChanged()
-                            showMessage(SearchStatus.NORMAL)
-                        } else {
-                            showMessage(SearchStatus.NOT_FOUND)
+            loadTracksUseCase.searchTracks(
+                binding.queryInput.text.toString(),
+                object : TracksSearchInteractor.TracksConsumer {
+                    override fun consume(foundTracks: List<Track>?) {
+                        handler.post {
+                            if (foundTracks == null) {
+                                showMessage(SearchStatus.NO_INTERNET)
+                            } else if (foundTracks.isNotEmpty()) {
+                                tracks.clear()
+                                tracks.addAll(foundTracks)
+                                trackAdapter.notifyDataSetChanged()
+                                showMessage(SearchStatus.NORMAL)
+                            } else {
+                                showMessage(SearchStatus.NOT_FOUND)
+                            }
                         }
                     }
                 }
             )
-
-
-//            iTunesService.search(binding.queryInput.text.toString())
-//                .enqueue(object : Callback<TrackSearchResponse> {
-//                    @SuppressLint("NotifyDataSetChanged")
-//                    override fun onResponse(
-//                        call: Call<TrackSearchResponse>,
-//                        response: Response<TrackSearchResponse>
-//                    ) {
-//                        when (response.code()) {
-//                            200 -> {
-//                                if (response.body()?.results?.isNotEmpty() == true) {
-//                                    tracks.clear()
-//                                    tracks.addAll(response.body()?.results!!)
-//                                    trackAdapter.notifyDataSetChanged()
-//                                    showMessage(SearchStatus.NORMAL)
-//                                } else {
-//                                    showMessage(SearchStatus.NOT_FOUND)
-//                                }
-//                            }
-//                            else -> {
-//                                showMessage(SearchStatus.NO_INTERNET)
-//                            }
-//                        }
-//
-//                    }
-//
-//                    override fun onFailure(call: Call<TrackSearchResponse>, t: Throwable) {
-//                        showMessage(SearchStatus.NO_INTERNET)
-//                    }
-//                })
         }
     }
 
@@ -244,63 +197,10 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun clearTrackHistory() {
-        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-        sharedPrefs.edit()
-            .remove("search_history")
-            .apply()
-    }
-
-    private fun addTrackHistory(track: Track) {
-        val history = getTrackHistory()
-
-        if (history.contains(track)) {
-            history.remove(track)
-        } else if (history.size >= HISTORY_LIMIT) {
-            history.removeLast()
-        }
-
-        history.add(0, track)
-
-        val gson = GsonBuilder()
-            .setPrettyPrinting()
-            .create()
-
-        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-
-        val historyJson = gson.toJson(history)
-
-        sharedPrefs.edit()
-            .putString("search_history", historyJson)
-            .apply()
-
-    }
-
-    private fun getTrackHistory(): MutableList<Track> {
-        val gson = GsonBuilder()
-            .setPrettyPrinting()
-            .create()
-
-        val sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
-
-        val history: MutableList<Track>
-
-        val json = sharedPrefs.getString("search_history", null)
-
-        if (json == null) {
-            history = mutableListOf()
-        } else {
-            val itemType = object : TypeToken<MutableList<Track>>() {}.type
-            history = gson.fromJson(json, itemType)
-        }
-
-        return history
-    }
-
     @SuppressLint("NotifyDataSetChanged")
     private fun updateTrackHistoryList() {
         tracksHistory.clear()
-        tracksHistory.addAll(getTrackHistory())
+        tracksHistory.addAll(localHistoryInteractor.getTracks())
         trackHistoryAdapter.notifyDataSetChanged()
     }
 
@@ -325,9 +225,20 @@ class SearchActivity : AppCompatActivity() {
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_MILLIS)
     }
 
+    private fun handleTrackClick(track: Track) {
+        if (clickDebounce()) {
+            localHistoryInteractor.saveTrack(track)
+            startPlayerActivity(track)
+            updateTrackHistoryList()
+        }
+    }
+
+    enum class SearchStatus {
+        NORMAL, NOT_FOUND, NO_INTERNET
+    }
+
     companion object {
         private const val SEARCH_TEXT = "SEARCH_TEXT"
-        private const val HISTORY_LIMIT = 10
         private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
         private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
     }

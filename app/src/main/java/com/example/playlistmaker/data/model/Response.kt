@@ -1,4 +1,4 @@
-package com.example.playlistmaker.data.dto
+package com.example.playlistmaker.data.model
 
 open class Response() {
     var resultCode = 0
