@@ -18,6 +18,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.Utils
 import com.example.playlistmaker.Utils.convertMillisToTime
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.domain.model.PlayerState
 import com.example.playlistmaker.domain.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -25,8 +26,6 @@ import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
-
-    private var playerState = STATE_DEFAULT
 
     private val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
 
@@ -109,13 +108,21 @@ class PlayerActivity : AppCompatActivity() {
             url = url,
             onPrependListener = {
                 binding.iBtnPlay.isEnabled = true
-                playerState = STATE_PREPARED
+                mediaPlayerInteractor.setState(
+                    PlayerState(
+                        PlayerState.State.PREPARED
+                    )
+                )
             },
             onCompletionListener = {
                 binding.iBtnPlay.setImageResource(R.drawable.play_button)
                 binding.tvCurrentTrackTime.text = convertMillisToTime(INITIAL_TIME_TIMER_MILLIS)
                 stopTimer()
-                playerState = STATE_PREPARED
+                mediaPlayerInteractor.setState(
+                    PlayerState(
+                        PlayerState.State.PREPARED
+                    )
+                )
             }
         )
     }
@@ -123,26 +130,36 @@ class PlayerActivity : AppCompatActivity() {
     private fun startPlayer() {
         mediaPlayerInteractor.startPlayer()
         binding.iBtnPlay.setImageResource(R.drawable.stop_button)
-        playerState = STATE_PLAYING
+        mediaPlayerInteractor.setState(
+            PlayerState(
+                PlayerState.State.PLAYING
+            )
+        )
     }
 
     private fun pausePlayer() {
         mediaPlayerInteractor.pausePlayer()
         binding.iBtnPlay.setImageResource(R.drawable.play_button)
-        playerState = STATE_PAUSED
+        mediaPlayerInteractor.setState(
+            PlayerState(
+                PlayerState.State.PAUSED
+            )
+        )
     }
 
     private fun playbackControl() {
-        when (playerState) {
-            STATE_PLAYING -> {
+        when (mediaPlayerInteractor.getState().state) {
+            PlayerState.State.PLAYING -> {
                 pausePlayer()
                 stopTimer()
             }
 
-            STATE_PREPARED, STATE_PAUSED -> {
+            PlayerState.State.PREPARED, PlayerState.State.PAUSED -> {
                 startPlayer()
                 startTimer()
             }
+
+            else -> {}
         }
     }
 
@@ -158,7 +175,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun createUpdateTimerTask(): Runnable {
         return object : Runnable {
             override fun run() {
-                if (playerState == STATE_PLAYING) {
+                if (mediaPlayerInteractor.getState().state == PlayerState.State.PLAYING) {
                     binding.tvCurrentTrackTime.text = mediaPlayerInteractor.getPlayerTime()
                     mainThreadHandler?.postDelayed(this, DELAY_MILLIS)
                 }
@@ -168,10 +185,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
         private const val DELAY_MILLIS = 500L
         private const val INITIAL_TIME_TIMER_MILLIS = 0
     }

@@ -1,5 +1,7 @@
 package com.example.playlistmaker.domain.api
 
+import com.example.playlistmaker.domain.model.PlayerState
+
 interface MediaPlayerInteractor {
     fun preparePlayer(
         url: String,
@@ -12,5 +14,6 @@ interface MediaPlayerInteractor {
     fun stopPlayer()
     fun releasePlayer()
     fun getPlayerTime(): String
-
+    fun getState(): PlayerState
+    fun setState(state: PlayerState)
 }
