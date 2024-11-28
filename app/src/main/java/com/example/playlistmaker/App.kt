@@ -4,7 +4,7 @@ import android.app.Application
 
 class App : Application() {
 
-    private val settingsInteractor = Creator.provideSettingsInteractor()
+    private val settingsInteractor by lazy { Creator.provideSettingsInteractor() }
 
     override fun onCreate() {
         super.onCreate()
