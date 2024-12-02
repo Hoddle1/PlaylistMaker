@@ -3,8 +3,8 @@ package com.example.playlistmaker.data.network
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.example.playlistmaker.StatusCodesApi
 import com.example.playlistmaker.data.NetworkClient
+import com.example.playlistmaker.data.StatusCodesApi
 import com.example.playlistmaker.data.model.Response
 import com.example.playlistmaker.data.model.TrackSearchRequest
 import com.google.gson.GsonBuilder

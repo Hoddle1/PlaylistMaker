@@ -11,8 +11,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.model.ThemeSettingsDto
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.domain.model.ThemeSettings
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.scThemeSwitcher.isSaveEnabled = false
 
         binding.scThemeSwitcher.setOnCheckedChangeListener { _, checked ->
-            settingsInteractor.switchTheme(ThemeSettingsDto(darkMode = checked))
+            settingsInteractor.switchTheme(ThemeSettings(darkMode = checked))
         }
 
         binding.mbShareApp.setOnClickListener {

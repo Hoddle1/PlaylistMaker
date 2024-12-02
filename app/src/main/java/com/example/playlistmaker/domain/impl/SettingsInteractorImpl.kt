@@ -1,28 +1,20 @@
 package com.example.playlistmaker.domain.impl
 
-import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.data.model.ThemeSettingsDto
+
 import com.example.playlistmaker.domain.api.SettingsInteractor
 import com.example.playlistmaker.domain.api.SettingsRepository
+import com.example.playlistmaker.domain.model.ThemeSettings
 
 class SettingsInteractorImpl(private val repository: SettingsRepository) : SettingsInteractor {
-    override fun getTheme(): ThemeSettingsDto {
+    override fun getTheme(): ThemeSettings {
         return repository.getTheme()
     }
 
-    override fun saveTheme(theme: ThemeSettingsDto) {
+    override fun saveTheme(theme: ThemeSettings) {
         repository.saveTheme(theme)
     }
 
-    override fun switchTheme(theme: ThemeSettingsDto) {
-        AppCompatDelegate.setDefaultNightMode(
-            when (theme.darkMode) {
-                null -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                true -> AppCompatDelegate.MODE_NIGHT_YES
-                false -> AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
-
-        saveTheme(theme)
+    override fun switchTheme(theme: ThemeSettings) {
+        repository.switchTheme(theme)
     }
 }

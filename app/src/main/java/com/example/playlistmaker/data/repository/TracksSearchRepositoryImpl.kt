@@ -1,7 +1,7 @@
 package com.example.playlistmaker.data.repository
 
-import com.example.playlistmaker.StatusCodesApi
 import com.example.playlistmaker.data.NetworkClient
+import com.example.playlistmaker.data.StatusCodesApi
 import com.example.playlistmaker.data.mapper.TrackSearchMapper
 import com.example.playlistmaker.data.model.TrackSearchRequest
 import com.example.playlistmaker.data.model.TrackSearchResponse
