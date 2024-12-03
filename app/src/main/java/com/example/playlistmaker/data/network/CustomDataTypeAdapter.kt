@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.data.network
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
