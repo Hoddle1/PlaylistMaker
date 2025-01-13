@@ -19,7 +19,10 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
 
     private val viewModel by lazy {
-        ViewModelProvider(this)[SettingsViewModel::class.java]
+        ViewModelProvider(
+            this,
+            SettingsViewModel.getViewModelFactory()
+        )[SettingsViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

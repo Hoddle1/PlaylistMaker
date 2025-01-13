@@ -6,12 +6,18 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.player.domain.MediaPlayerInteractor
 
 
-class MediaPlayerViewModel : ViewModel() {
+class MediaPlayerViewModel(
+    private val mediaPlayerInteractor: MediaPlayerInteractor
+) : ViewModel() {
 
-    private val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
+//    private val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
 
     private var currentTrackTime = MutableLiveData<String>()
     fun getCurrentTrackTime(): LiveData<String> = currentTrackTime
@@ -44,8 +50,7 @@ class MediaPlayerViewModel : ViewModel() {
         mediaPlayerState.postValue(MediaPlayerState.Paused)
     }
 
-    fun onDestroy() {
-        stopTimer()
+    fun releasePlayer() {
         mediaPlayerInteractor.releasePlayer()
     }
 
@@ -66,11 +71,13 @@ class MediaPlayerViewModel : ViewModel() {
     }
 
     private fun startTimer() {
-        timerRunnable = createUpdateTimerTask()
-        mainThreadHandler.post(timerRunnable!!)
+        createUpdateTimerTask().also {
+            timerRunnable = it
+            mainThreadHandler.post(it)
+        }
     }
 
-    private fun stopTimer() {
+    fun stopTimer() {
         timerRunnable?.let { mainThreadHandler.removeCallbacks(it) }
     }
 
@@ -87,5 +94,15 @@ class MediaPlayerViewModel : ViewModel() {
 
     companion object {
         private const val DELAY_MILLIS = 500L
+
+        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
+
+                MediaPlayerViewModel(
+                    mediaPlayerInteractor
+                )
+            }
+        }
     }
 }

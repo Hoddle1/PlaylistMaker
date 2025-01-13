@@ -2,10 +2,10 @@ package com.example.playlistmaker.search.data.impl
 
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.StatusCodesApi
-import com.example.playlistmaker.search.data.TracksSearchRepository
 import com.example.playlistmaker.search.data.dto.TrackSearchRequest
 import com.example.playlistmaker.search.data.dto.TrackSearchResponse
 import com.example.playlistmaker.search.data.mapper.TrackSearchMapper
+import com.example.playlistmaker.search.domain.TracksSearchRepository
 import com.example.playlistmaker.search.domain.model.Track
 
 class TracksSearchRepositoryImpl(private val networkClient: NetworkClient) :

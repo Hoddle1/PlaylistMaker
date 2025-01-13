@@ -3,19 +3,21 @@ package com.example.playlistmaker.settings.ui.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.settings.domain.SettingsInteractor
 import com.example.playlistmaker.settings.domain.model.ThemeSettings
 
-class SettingsViewModel : ViewModel() {
-    private val settingsInteractor = Creator.provideSettingsInteractor()
+class SettingsViewModel(
+    private val settingsInteractor: SettingsInteractor
+) : ViewModel() {
 
-    private val isDarkTheme = MutableLiveData<Boolean>()
+
+    private val isDarkTheme = MutableLiveData<Boolean>(settingsInteractor.getTheme().darkMode)
 
     fun observeDarkTheme(): LiveData<Boolean> = isDarkTheme
-
-    init {
-        isDarkTheme.postValue(settingsInteractor.getTheme().darkMode)
-    }
 
     fun switchTheme(darkMode: Boolean) {
         isDarkTheme.postValue(darkMode)
@@ -25,6 +27,18 @@ class SettingsViewModel : ViewModel() {
                 darkMode = darkMode
             )
         )
+    }
+
+    companion object {
+        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val settingsInteractor = Creator.provideSettingsInteractor()
+
+                SettingsViewModel(
+                    settingsInteractor
+                )
+            }
+        }
     }
 
 }

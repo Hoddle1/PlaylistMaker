@@ -1,7 +1,7 @@
 package com.example.playlistmaker.search.domain.impl
 
-import com.example.playlistmaker.search.data.TracksSearchRepository
 import com.example.playlistmaker.search.domain.TracksSearchInteractor
+import com.example.playlistmaker.search.domain.TracksSearchRepository
 import java.util.concurrent.Executors
 
 class TracksSearchInteractorImpl(private val repository: TracksSearchRepository) :

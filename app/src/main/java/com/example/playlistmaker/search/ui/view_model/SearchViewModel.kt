@@ -5,15 +5,18 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.search.domain.TrackHistoryInteractor
 import com.example.playlistmaker.search.domain.TracksSearchInteractor
 import com.example.playlistmaker.search.domain.model.Track
 
-class SearchViewModel : ViewModel() {
-
-    private val localHistoryInteractor = Creator.provideTracksHistoryInteractor()
-
-    private val loadTracksUseCase = Creator.provideTracksSearchInteractor()
+class SearchViewModel(
+    private val tracksHistoryInteractor: TrackHistoryInteractor,
+    private val tracksSearchInteractor: TracksSearchInteractor
+) : ViewModel() {
 
     private val trackListState = MutableLiveData<TrackListState>()
 
@@ -31,7 +34,7 @@ class SearchViewModel : ViewModel() {
         if (queryText.isNotEmpty()) {
             trackListState.postValue(TrackListState.Loading)
 
-            loadTracksUseCase.searchTracks(
+            tracksSearchInteractor.searchTracks(
                 queryText,
                 object : TracksSearchInteractor.TracksConsumer {
                     override fun consume(foundTracks: List<Track>?) {
@@ -49,11 +52,11 @@ class SearchViewModel : ViewModel() {
     }
 
     fun saveTrack(track: Track) {
-        localHistoryInteractor.saveTrack(track)
+        tracksHistoryInteractor.saveTrack(track)
     }
 
     fun clearHistory() {
-        localHistoryInteractor.clear()
+        tracksHistoryInteractor.clear()
     }
 
     fun clickDebounce(): Boolean {
@@ -84,7 +87,7 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun showHistory() {
-        trackListState.postValue(TrackListState.History(localHistoryInteractor.getTracks()))
+        trackListState.postValue(TrackListState.History(tracksHistoryInteractor.getTracks()))
     }
 
     fun queryInputOnFocused() {
@@ -94,5 +97,17 @@ class SearchViewModel : ViewModel() {
     companion object {
         private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
         private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
+
+        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val tracksHistoryInteractor = Creator.provideTracksHistoryInteractor()
+                val tracksSearchInteractor = Creator.provideTracksSearchInteractor()
+
+                SearchViewModel(
+                    tracksHistoryInteractor,
+                    tracksSearchInteractor,
+                )
+            }
+        }
     }
 }

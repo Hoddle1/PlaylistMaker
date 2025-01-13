@@ -2,11 +2,10 @@ package com.example.playlistmaker.settings.data.impl
 
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.settings.data.SettingsRepository
 import com.example.playlistmaker.settings.data.dto.ThemeSettingsDto
 import com.example.playlistmaker.settings.data.mapper.ThemeSettingsMapper
+import com.example.playlistmaker.settings.domain.SettingsRepository
 import com.example.playlistmaker.settings.domain.model.ThemeSettings
-import com.example.playlistmaker.util.Constants.THEME_KEY
 
 class SettingsRepositoryImpl(private val sharedPreferences: SharedPreferences) :
     SettingsRepository {
@@ -39,4 +38,7 @@ class SettingsRepositoryImpl(private val sharedPreferences: SharedPreferences) :
         saveTheme(theme)
     }
 
+    companion object {
+        private const val THEME_KEY = "dark_theme"
+    }
 }

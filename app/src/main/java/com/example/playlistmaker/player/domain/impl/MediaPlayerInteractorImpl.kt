@@ -1,7 +1,7 @@
 package com.example.playlistmaker.player.domain.impl
 
-import com.example.playlistmaker.player.data.MediaPlayerRepository
 import com.example.playlistmaker.player.domain.MediaPlayerInteractor
+import com.example.playlistmaker.player.domain.MediaPlayerRepository
 import com.example.playlistmaker.util.Utils.convertMillisToTime
 
 class MediaPlayerInteractorImpl(

@@ -1,7 +1,6 @@
 package com.example.playlistmaker.search.ui.activity
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +18,6 @@ import com.example.playlistmaker.search.ui.adapter.TrackAdapter
 import com.example.playlistmaker.search.ui.view_model.ErrorSearchStatus
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
 import com.example.playlistmaker.search.ui.view_model.TrackListState
-import com.example.playlistmaker.util.Constants
 
 
 class SearchActivity : AppCompatActivity() {
@@ -35,7 +33,7 @@ class SearchActivity : AppCompatActivity() {
     private val trackAdapter = TrackAdapter(tracks)
 
     private val viewModel by lazy {
-        ViewModelProvider(this)[SearchViewModel::class.java]
+        ViewModelProvider(this, SearchViewModel.getViewModelFactory())[SearchViewModel::class.java]
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -142,9 +140,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun startPlayerActivity(track: Track) {
-        val intent = Intent(this, MediaPlayerActivity::class.java)
-        intent.putExtra(Constants.TRACK_DATA, track)
-        startActivity(intent)
+        MediaPlayerActivity.openPlayer(this, track)
     }
 
     private fun clearSearchText() {
