@@ -1,23 +1,16 @@
 package com.example.playlistmaker.player.ui.view_model
 
-import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.player.domain.MediaPlayerInteractor
 
 
 class MediaPlayerViewModel(
     private val mediaPlayerInteractor: MediaPlayerInteractor
 ) : ViewModel() {
-
-//    private val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
 
     private var currentTrackTime = MutableLiveData<String>()
     fun getCurrentTrackTime(): LiveData<String> = currentTrackTime
@@ -26,6 +19,7 @@ class MediaPlayerViewModel(
     fun getMediaPlayerState(): LiveData<MediaPlayerState> = mediaPlayerState
 
     private var mainThreadHandler = Handler(Looper.getMainLooper())
+
     private var timerRunnable: Runnable? = null
 
     fun preparePlayer(url: String) {
@@ -95,14 +89,14 @@ class MediaPlayerViewModel(
     companion object {
         private const val DELAY_MILLIS = 500L
 
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
-
-                MediaPlayerViewModel(
-                    mediaPlayerInteractor
-                )
-            }
-        }
+//        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
+//
+//                MediaPlayerViewModel(
+//                    mediaPlayerInteractor
+//                )
+//            }
+//        }
     }
 }

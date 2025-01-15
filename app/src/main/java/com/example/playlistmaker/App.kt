@@ -1,16 +1,23 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.di.playerModule
+import com.example.playlistmaker.di.searchModule
+import com.example.playlistmaker.di.settingsModule
+import com.example.playlistmaker.settings.domain.SettingsInteractor
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class App : Application() {
-
-    private val settingsInteractor by lazy { Creator.provideSettingsInteractor() }
-
     override fun onCreate() {
         super.onCreate()
-        Creator.initApplication(this)
+        startKoin {
+            androidContext(this@App)
+            modules(playerModule, searchModule, settingsModule)
+        }
+
+        val settingsInteractor: SettingsInteractor by inject()
         settingsInteractor.switchTheme(settingsInteractor.getTheme())
     }
-
 }

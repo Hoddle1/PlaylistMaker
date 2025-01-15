@@ -7,8 +7,9 @@ import com.example.playlistmaker.settings.data.mapper.ThemeSettingsMapper
 import com.example.playlistmaker.settings.domain.SettingsRepository
 import com.example.playlistmaker.settings.domain.model.ThemeSettings
 
-class SettingsRepositoryImpl(private val sharedPreferences: SharedPreferences) :
-    SettingsRepository {
+class SettingsRepositoryImpl(
+    private val sharedPreferences: SharedPreferences
+) : SettingsRepository {
 
     override fun getTheme(): ThemeSettings {
         val darkModeValue = sharedPreferences.contains(THEME_KEY)

@@ -4,8 +4,9 @@ import com.example.playlistmaker.search.domain.TracksSearchInteractor
 import com.example.playlistmaker.search.domain.TracksSearchRepository
 import java.util.concurrent.Executors
 
-class TracksSearchInteractorImpl(private val repository: TracksSearchRepository) :
-    TracksSearchInteractor {
+class TracksSearchInteractorImpl(
+    private val repository: TracksSearchRepository
+) : TracksSearchInteractor {
 
     private val executor = Executors.newCachedThreadPool()
 
