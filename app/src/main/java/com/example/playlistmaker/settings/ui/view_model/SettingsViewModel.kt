@@ -25,16 +25,4 @@ class SettingsViewModel(
         )
     }
 
-//    companion object {
-//        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-//            initializer {
-//                val settingsInteractor = Creator.provideSettingsInteractor()
-//
-//                SettingsViewModel(
-//                    settingsInteractor
-//                )
-//            }
-//        }
-//    }
-
 }

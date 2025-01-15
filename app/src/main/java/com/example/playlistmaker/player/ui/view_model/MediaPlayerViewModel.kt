@@ -88,15 +88,5 @@ class MediaPlayerViewModel(
 
     companion object {
         private const val DELAY_MILLIS = 500L
-
-//        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-//            initializer {
-//                val mediaPlayerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
-//
-//                MediaPlayerViewModel(
-//                    mediaPlayerInteractor
-//                )
-//            }
-//        }
     }
 }
