@@ -12,4 +12,5 @@
     <dimen name="content_title_text_size">13sp</dimen>
     <dimen name="track_content_vertical_margin">16dp</dimen>
     <dimen name="default_playlist_horizontal_margin">16dp</dimen>
+    <dimen name="top_margin_new_playlist_button">24dp</dimen>
 </resources>
