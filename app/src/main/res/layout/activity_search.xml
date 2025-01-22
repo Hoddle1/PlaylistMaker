@@ -14,8 +14,8 @@
 
         <ImageButton
             android:id="@+id/iBtnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/back_button_size"
+            android:layout_height="@dimen/back_button_size"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="12dp"
             android:backgroundTint="@color/transparent"
@@ -138,15 +138,9 @@
         <TextView
             android:id="@+id/tvPlaceholder"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_weight="400"
-            android:fontFamily="@font/ys_display_medium"
-            android:lineHeight="22sp"
+            style="@style/PlaceholderTextView"
+            android:layout_height="wrap_content"
             android:text="@string/no_internet"
-            android:textAlignment="center"
-            android:textColor="@color/search_placeholder_text"
-            android:textSize="@dimen/placeholder_text_size"
             android:visibility="gone" />
 
         <Button
