@@ -7,7 +7,9 @@
 
     <color name="main_text">#1A1B22</color>
     <color name="progress">#3772E7</color>
+    <color name="bottom_navigation_item_active">#3772E7</color>
     <color name="track_content_title">#AEAFB4</color>
+    <color name="top_border_bottom_navigation">#E6E8EB</color>
 
     <color name="header_text">#1A1B22</color>
     <color name="default_placeholder_text">#1A1B22</color>
@@ -25,6 +27,8 @@
     <color name="track_content_value">#1A1B22</color>
     <color name="background_player_button">#1A1B22</color>
     <color name="tab_library_color">#1A1B22</color>
+    <color name="bottom_navigation_item_inactive">#1A1B22</color>
+    <color name="bottom_navigation_background">#FFFFFF</color>
 
 
 </resources>

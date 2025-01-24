@@ -19,5 +19,8 @@
     <color name="track_content_value">#FFFFFF</color>
     <color name="background_player_button">#FFFFFF</color>
     <color name="tab_library_color">#FFFFFF</color>
+    <color name="bottom_navigation_item_inactive">#FFFFFF</color>
+    <color name="bottom_navigation_background">#1A1B22</color>
+
 
 </resources>
