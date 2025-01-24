@@ -1,16 +1,17 @@
-package com.example.playlistmaker.search.ui.activity
+package com.example.playlistmaker.search.ui.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.player.ui.activity.MediaPlayerActivity
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.ui.adapter.TrackAdapter
@@ -19,10 +20,10 @@ import com.example.playlistmaker.search.ui.view_model.SearchViewModel
 import com.example.playlistmaker.search.ui.view_model.TrackListState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+class SearchFragment : Fragment() {
+    private var _binding: FragmentSearchBinding? = null
 
-class SearchActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivitySearchBinding
+    private val binding get() = _binding!!
 
     private val tracks: MutableList<Track> = mutableListOf()
 
@@ -34,22 +35,16 @@ class SearchActivity : AppCompatActivity() {
 
     private val viewModel by viewModel<SearchViewModel>()
 
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        enableEdgeToEdge()
-
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.llMain) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        binding.iBtnBack.setOnClickListener { finish() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         trackAdapter.onItemClickListener = { handleTrackClick(it) }
 
@@ -85,14 +80,14 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.tracksList.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.tracksList.adapter = trackAdapter
 
         binding.historyList.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.historyList.adapter = trackHistoryAdapter
 
-        viewModel.getTrackListState().observe(this) { state ->
+        viewModel.getTrackListState().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is TrackListState.Content -> {
                     tracks.clear()
@@ -122,6 +117,10 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     private fun handleTrackClick(track: Track) {
         if (viewModel.clickDebounce()) {
@@ -138,7 +137,10 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun startPlayerActivity(track: Track) {
-        MediaPlayerActivity.openPlayer(this, track)
+        findNavController().navigate(
+            R.id.action_searchFragment_to_mediaPlayerActivity2,
+            MediaPlayerActivity.createArgs(track)
+        )
     }
 
     private fun clearSearchText() {
@@ -212,5 +214,6 @@ class SearchActivity : AppCompatActivity() {
         binding.btnPlaceholder.isVisible = false
         binding.trackHistoryContainer.isVisible = false
     }
+
 
 }

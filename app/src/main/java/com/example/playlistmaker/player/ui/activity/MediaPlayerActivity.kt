@@ -1,11 +1,10 @@
 package com.example.playlistmaker.player.ui.activity
 
-import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -120,11 +119,8 @@ class MediaPlayerActivity : AppCompatActivity() {
     companion object {
         private const val TRACK_DATA = "TRACK_DATA"
 
-        fun openPlayer(context: Context, track: Track) {
-            val intent = Intent(context, MediaPlayerActivity::class.java)
-            intent.putExtra(TRACK_DATA, track)
-            context.startActivity(intent)
-        }
+        fun createArgs(track: Track): Bundle = bundleOf(TRACK_DATA to track)
     }
+
 
 }
