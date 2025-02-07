@@ -1,8 +1,10 @@
 package com.example.playlistmaker.player.ui.view_model
 
-sealed class MediaPlayerState {
-    data object Default : MediaPlayerState()
-    data object Prepared : MediaPlayerState()
-    data object Playing : MediaPlayerState()
-    data object Paused : MediaPlayerState()
+import com.example.playlistmaker.R
+
+sealed class MediaPlayerState(val imageResource: Int, val progress: String) {
+    class Default : MediaPlayerState(R.drawable.play_button, "00:00")
+    class Prepared : MediaPlayerState(R.drawable.play_button, "00:00")
+    class Playing(progress: String) : MediaPlayerState(R.drawable.stop_button, progress)
+    class Paused(progress: String) : MediaPlayerState(R.drawable.play_button, progress)
 }

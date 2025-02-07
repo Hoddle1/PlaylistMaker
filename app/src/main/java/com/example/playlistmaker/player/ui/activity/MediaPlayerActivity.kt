@@ -12,7 +12,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.player.ui.view_model.MediaPlayerState
 import com.example.playlistmaker.player.ui.view_model.MediaPlayerViewModel
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.util.Utils
@@ -42,18 +41,8 @@ class MediaPlayerActivity : AppCompatActivity() {
         }
 
         viewModel.getMediaPlayerState().observe(this) { state ->
-            when (state) {
-                MediaPlayerState.Playing -> {
-                    binding.iBtnPlay.setImageResource(R.drawable.stop_button)
-                }
-
-                MediaPlayerState.Default, MediaPlayerState.Paused, MediaPlayerState.Prepared -> {
-                    binding.iBtnPlay.setImageResource(R.drawable.play_button)
-                }
-            }
-        }
-        viewModel.getCurrentTrackTime().observe(this) { currentTrackTime ->
-            binding.tvCurrentTrackTime.text = currentTrackTime
+            binding.iBtnPlay.setImageResource(state.imageResource)
+            binding.tvCurrentTrackTime.text = state.progress
         }
 
         binding.iBtnBack.setOnClickListener { finish() }
@@ -108,12 +97,6 @@ class MediaPlayerActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         viewModel.pausePlayer()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.stopTimer()
-        viewModel.releasePlayer()
     }
 
     companion object {

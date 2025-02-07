@@ -14,7 +14,8 @@ class MediaPlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) : MediaPla
         mediaPlayer.setOnPreparedListener {
             onPrependListener()
         }
-        mediaPlayer.setOnCompletionListener {
+        mediaPlayer.setOnCompletionListener { mp ->
+            mp.seekTo(0)
             onCompletionListener()
         }
 
@@ -34,6 +35,10 @@ class MediaPlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) : MediaPla
 
     override fun releasePlayer() {
         mediaPlayer.release()
+    }
+
+    override fun seekTo(time: Int) {
+        mediaPlayer.seekTo(time)
     }
 
     override fun getCurrentPosition(): Int {

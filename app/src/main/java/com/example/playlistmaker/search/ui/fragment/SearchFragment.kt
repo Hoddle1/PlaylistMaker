@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
@@ -18,6 +19,7 @@ import com.example.playlistmaker.search.ui.adapter.TrackAdapter
 import com.example.playlistmaker.search.ui.view_model.ErrorSearchStatus
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
 import com.example.playlistmaker.search.ui.view_model.TrackListState
+import com.example.playlistmaker.util.Utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -35,6 +37,8 @@ class SearchFragment : Fragment() {
 
     private val viewModel by viewModel<SearchViewModel>()
 
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,9 +50,18 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        trackAdapter.onItemClickListener = { handleTrackClick(it) }
+        onTrackClickDebounce = debounce(
+            CLICK_DEBOUNCE_DELAY_MILLIS,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { track ->
+            viewModel.saveTrack(track)
+            startPlayerActivity(track)
+        }
 
-        trackHistoryAdapter.onItemClickListener = { handleTrackClick(it) }
+        trackAdapter.onItemClickListener = { onTrackClickDebounce(it) }
+
+        trackHistoryAdapter.onItemClickListener = { onTrackClickDebounce(it) }
 
         binding.clearIcon.setOnClickListener {
             clearSearchText()
@@ -120,13 +133,6 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun handleTrackClick(track: Track) {
-        if (viewModel.clickDebounce()) {
-            viewModel.saveTrack(track)
-            startPlayerActivity(track)
-        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -215,5 +221,7 @@ class SearchFragment : Fragment() {
         binding.trackHistoryContainer.isVisible = false
     }
 
-
+    companion object {
+        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
+    }
 }
