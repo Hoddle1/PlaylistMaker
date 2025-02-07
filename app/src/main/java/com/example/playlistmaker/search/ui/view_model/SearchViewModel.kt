@@ -1,13 +1,15 @@
 package com.example.playlistmaker.search.ui.view_model
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.search.domain.TrackHistoryInteractor
 import com.example.playlistmaker.search.domain.TracksSearchInteractor
 import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val tracksHistoryInteractor: TrackHistoryInteractor,
@@ -18,32 +20,36 @@ class SearchViewModel(
 
     fun getTrackListState(): LiveData<TrackListState> = trackListState
 
-    private var isClickAllowed = true
-
-    private val handler = Handler(Looper.getMainLooper())
-
     private var searchText = ""
 
-    private val searchRunnable = Runnable { search(searchText) }
+    private var searchDebounceJob: Job? = null
 
     fun search(queryText: String) {
         if (queryText.isNotEmpty()) {
             trackListState.postValue(TrackListState.Loading)
 
-            tracksSearchInteractor.searchTracks(
-                queryText,
-                object : TracksSearchInteractor.TracksConsumer {
-                    override fun consume(foundTracks: List<Track>?) {
-                        if (foundTracks == null) {
-                            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NO_INTERNET))
-                        } else if (foundTracks.isNotEmpty()) {
-                            trackListState.postValue(TrackListState.Content(foundTracks))
-                        } else {
-                            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NOT_FOUND))
-                        }
+            viewModelScope.launch {
+                tracksSearchInteractor
+                    .searchTracks(queryText)
+                    .collect { pair ->
+                        processResult(pair.first, pair.second)
                     }
-                }
-            )
+            }
+        }
+    }
+
+    private fun processResult(foundNames: List<Track>?, errorMessage: String?) {
+        val tracks = mutableListOf<Track>()
+        if (foundNames != null) {
+            tracks.addAll(foundNames)
+        }
+
+        if (errorMessage != null) {
+            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NO_INTERNET))
+        } else if (tracks.isEmpty()) {
+            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NOT_FOUND))
+        } else {
+            trackListState.postValue(TrackListState.Content(tracks))
         }
     }
 
@@ -55,30 +61,19 @@ class SearchViewModel(
         tracksHistoryInteractor.clear()
     }
 
-    fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY_MILLIS)
-        }
-        return current
-    }
-
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_MILLIS)
-    }
-
     fun onTextChange(queryText: String) {
         if (searchText == queryText) return
 
         searchText = queryText
 
         if (queryText.isEmpty()) {
-            handler.removeCallbacks(searchRunnable)
+            searchDebounceJob?.cancel()
             showHistory()
         } else {
-            searchDebounce()
+            searchDebounceJob = viewModelScope.launch {
+                delay(SEARCH_DEBOUNCE_DELAY_MILLIS)
+                search(searchText)
+            }
         }
     }
 
@@ -91,7 +86,6 @@ class SearchViewModel(
     }
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
         private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
     }
 }

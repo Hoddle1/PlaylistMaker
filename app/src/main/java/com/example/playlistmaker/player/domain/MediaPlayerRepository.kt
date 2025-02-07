@@ -8,6 +8,7 @@ interface MediaPlayerRepository {
     )
 
     fun startPlayer()
+
     fun pausePlayer()
     fun stopPlayer()
     fun releasePlayer()

@@ -14,7 +14,8 @@ class MediaPlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) : MediaPla
         mediaPlayer.setOnPreparedListener {
             onPrependListener()
         }
-        mediaPlayer.setOnCompletionListener {
+        mediaPlayer.setOnCompletionListener { mp ->
+            mp.seekTo(0)
             onCompletionListener()
         }
 
