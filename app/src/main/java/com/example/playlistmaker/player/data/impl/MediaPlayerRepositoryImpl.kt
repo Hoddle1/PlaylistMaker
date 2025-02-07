@@ -37,10 +37,6 @@ class MediaPlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) : MediaPla
         mediaPlayer.release()
     }
 
-    override fun seekTo(time: Int) {
-        mediaPlayer.seekTo(time)
-    }
-
     override fun getCurrentPosition(): Int {
         return mediaPlayer.currentPosition
     }

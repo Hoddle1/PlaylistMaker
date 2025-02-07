@@ -36,10 +36,6 @@ class MediaPlayerInteractorImpl(
         repository.releasePlayer()
     }
 
-    override fun seekTo(time: Int) {
-        repository.seekTo(time)
-    }
-
     override fun getPlayerTime(): String {
         return convertMillisToTime(repository.getCurrentPosition())
     }
