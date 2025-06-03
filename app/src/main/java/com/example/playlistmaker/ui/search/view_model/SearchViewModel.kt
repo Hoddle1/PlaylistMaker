@@ -38,6 +38,14 @@ class SearchViewModel(
         }
     }
 
+    fun onResume() {
+        when (trackListState.value) {
+            is TrackListState.Content -> search(searchText)
+            is TrackListState.History -> showHistory()
+            else -> {}
+        }
+    }
+
     private fun processResult(foundNames: List<Track>?, errorMessage: String?) {
         val tracks = mutableListOf<Track>()
         if (foundNames != null) {

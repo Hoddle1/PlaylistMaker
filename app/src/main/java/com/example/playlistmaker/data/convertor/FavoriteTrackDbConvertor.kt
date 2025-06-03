@@ -16,6 +16,7 @@ class FavoriteTrackDbConvertor {
             primaryGenreName = track.primaryGenreName,
             country = track.country,
             previewUrl = track.previewUrl,
+            isFavorite = track.isFavorite
         )
     }
 
@@ -31,6 +32,7 @@ class FavoriteTrackDbConvertor {
             primaryGenreName = track.primaryGenreName,
             country = track.country,
             previewUrl = track.previewUrl,
+            isFavorite = track.isFavorite
         )
     }
 }

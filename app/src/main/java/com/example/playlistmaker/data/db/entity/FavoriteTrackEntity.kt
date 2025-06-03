@@ -26,6 +26,8 @@ data class FavoriteTrackEntity(
     val primaryGenreName: String,
     @ColumnInfo(name = "country")
     val country: String,
+    @ColumnInfo(name = "is_favorite")
+    val isFavorite: Boolean,
     @ColumnInfo(name = "preview_url")
     val previewUrl: String,
     @ColumnInfo(name = "timestamp")
