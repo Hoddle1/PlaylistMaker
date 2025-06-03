@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".library.ui.fragment.FavoriteTracksFragment">
+    tools:context=".ui.library.fragment.FavoriteTracksFragment">
 
     <LinearLayout
         android:id="@+id/llPlaceholder"
@@ -30,5 +30,11 @@
             android:text="@string/no_favorites" />
 
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favoriteTracksList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
 </FrameLayout>
