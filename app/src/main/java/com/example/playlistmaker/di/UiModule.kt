@@ -30,7 +30,8 @@ val uiModule = module {
     viewModel {
         SearchViewModel(
             tracksSearchInteractor = get(),
-            tracksHistoryInteractor = get()
+            tracksHistoryInteractor = get(),
+            favoriteTrackInteractor = get()
         )
     }
 

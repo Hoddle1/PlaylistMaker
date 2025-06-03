@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.domain.db.FavoriteTrackInteractor
 import com.example.playlistmaker.domain.search.TrackHistoryInteractor
 import com.example.playlistmaker.domain.search.TracksSearchInteractor
 import com.example.playlistmaker.domain.search.model.Track
@@ -13,16 +14,32 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val tracksHistoryInteractor: TrackHistoryInteractor,
-    private val tracksSearchInteractor: TracksSearchInteractor
+    private val tracksSearchInteractor: TracksSearchInteractor,
+    private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
 
     private val trackListState = MutableLiveData<TrackListState>()
+    private var searchText = ""
+    private var searchDebounceJob: Job? = null
 
     fun getTrackListState(): LiveData<TrackListState> = trackListState
 
-    private var searchText = ""
+    init {
+        observeFavoriteUpdates()
+    }
 
-    private var searchDebounceJob: Job? = null
+    private fun observeFavoriteUpdates() {
+        viewModelScope.launch {
+            favoriteTrackInteractor.favoritesUpdates.collect {
+                if (trackListState.value is TrackListState.Content) {
+                    search(searchText)
+                }
+                else if (trackListState.value is TrackListState.History) {
+                    showHistory()
+                }
+            }
+        }
+    }
 
     fun search(queryText: String) {
         if (queryText.isNotEmpty()) {
@@ -35,14 +52,6 @@ class SearchViewModel(
                         processResult(pair.first, pair.second)
                     }
             }
-        }
-    }
-
-    fun onResume() {
-        when (trackListState.value) {
-            is TrackListState.Content -> search(searchText)
-            is TrackListState.History -> showHistory()
-            else -> {}
         }
     }
 

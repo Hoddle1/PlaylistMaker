@@ -20,6 +20,18 @@ class FavoriteTracksViewModel(
 
     fun getFavoriteTracksState(): LiveData<FavoriteTracksState> = favoriteTracksState
 
+    init {
+        observeFavoritesUpdates()
+    }
+
+    private fun observeFavoritesUpdates() {
+        viewModelScope.launch {
+            favoriteTrackInteractor.favoritesUpdates.collect {
+                getFavoriteTracks()
+            }
+        }
+    }
+
     fun getFavoriteTracks() {
         viewModelScope.launch {
             favoriteTrackInteractor.getFavoriteTracks()
