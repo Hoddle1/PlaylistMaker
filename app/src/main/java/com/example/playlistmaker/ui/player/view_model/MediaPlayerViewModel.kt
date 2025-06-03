@@ -53,8 +53,9 @@ class MediaPlayerViewModel(
                 favoriteTrackInteractor.addFavoriteTrack(track)
             }
         }
-
-        isFavorite.postValue(!track.isFavorite)
+        val newFavoriteState = !track.isFavorite
+        track.isFavorite = newFavoriteState
+        isFavorite.postValue(newFavoriteState)
     }
 
     private fun startPlayer() {
