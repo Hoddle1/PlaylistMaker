@@ -21,6 +21,7 @@
     <color name="tab_library_color">#FFFFFF</color>
     <color name="bottom_navigation_item_inactive">#FFFFFF</color>
     <color name="bottom_navigation_background">#1A1B22</color>
+    <color name="border_edittext_playlist_add">#FFFFFF</color>
 
 
 </resources>
