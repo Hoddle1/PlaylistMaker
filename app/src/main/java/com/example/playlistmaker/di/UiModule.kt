@@ -17,7 +17,9 @@ val uiModule = module {
     }
 
     viewModel {
-        PlayListViewModel()
+        PlayListViewModel(
+            playlistInteractor = get()
+        )
     }
 
     viewModel {
@@ -40,4 +42,6 @@ val uiModule = module {
             settingsInteractor = get()
         )
     }
+
+
 }

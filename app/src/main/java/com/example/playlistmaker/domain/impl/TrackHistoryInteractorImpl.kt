@@ -1,9 +1,9 @@
 package com.example.playlistmaker.domain.impl
 
 import com.example.playlistmaker.data.db.AppDatabase
+import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.domain.search.TrackHistoryInteractor
 import com.example.playlistmaker.domain.search.TrackHistoryRepository
-import com.example.playlistmaker.domain.search.model.Track
 
 class TrackHistoryInteractorImpl(
     private val repository: TrackHistoryRepository,

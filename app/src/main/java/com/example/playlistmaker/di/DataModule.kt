@@ -4,8 +4,10 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.room.Room
 import com.example.playlistmaker.data.convertor.FavoriteTrackDbConvertor
+import com.example.playlistmaker.data.convertor.PlaylistDbConverter
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.impl.FavoriteTrackRepositoryImpl
+import com.example.playlistmaker.data.impl.PlaylistRepositoryImpl
 import com.example.playlistmaker.data.impl.TrackHistoryRepositoryImpl
 import com.example.playlistmaker.data.player.impl.MediaPlayerRepositoryImpl
 import com.example.playlistmaker.data.search.NetworkClient
@@ -13,6 +15,7 @@ import com.example.playlistmaker.data.search.impl.TracksSearchRepositoryImpl
 import com.example.playlistmaker.data.search.network.RetrofitClient
 import com.example.playlistmaker.data.settings.impl.SettingsRepositoryImpl
 import com.example.playlistmaker.domain.db.FavoriteTrackRepository
+import com.example.playlistmaker.domain.db.PlaylistRepository
 import com.example.playlistmaker.domain.player.MediaPlayerRepository
 import com.example.playlistmaker.domain.search.TrackHistoryRepository
 import com.example.playlistmaker.domain.search.TracksSearchRepository
@@ -76,6 +79,19 @@ val dataModule = module {
     single<SettingsRepository> {
         SettingsRepositoryImpl(
             sharedPreferences = get()
+        )
+    }
+
+    factory {
+        PlaylistDbConverter(
+            gson = get()
+        )
+    }
+
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(
+            playlistDbConverter = get(),
+            appDatabase = get()
         )
     }
 }

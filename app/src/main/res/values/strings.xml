@@ -45,4 +45,10 @@
     <string name="create_playlist">Создать</string>
     <string name="playlist_name_edittext_hint">Название*</string>
     <string name="playlist_description_edittext_hint">Описание</string>
+
+    <plurals name="tracks">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+    </plurals>
 </resources>

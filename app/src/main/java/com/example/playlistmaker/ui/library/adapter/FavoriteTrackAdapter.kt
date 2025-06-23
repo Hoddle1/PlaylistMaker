@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.search.model.Track
+import com.example.playlistmaker.domain.entity.Track
 
 class FavoriteTrackAdapter(private val tracks: List<Track>) :
     RecyclerView.Adapter<FavoriteTracksViewHolder>() {

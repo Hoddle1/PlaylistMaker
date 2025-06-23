@@ -1,6 +1,6 @@
 package com.example.playlistmaker.ui.library.view_model
 
-import com.example.playlistmaker.domain.search.model.Track
+import com.example.playlistmaker.domain.entity.Track
 
 
 sealed class FavoriteTracksState {

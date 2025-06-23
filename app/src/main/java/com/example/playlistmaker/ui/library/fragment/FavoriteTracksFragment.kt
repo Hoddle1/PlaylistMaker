@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
-import com.example.playlistmaker.domain.search.model.Track
+import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.ui.library.adapter.FavoriteTrackAdapter
 import com.example.playlistmaker.ui.library.view_model.FavoriteTracksState
 import com.example.playlistmaker.ui.library.view_model.FavoriteTracksViewModel
