@@ -1,16 +1,24 @@
 package com.example.playlistmaker.ui.playlistadd.fragment
 
 import android.Manifest
+import android.R.layout
+import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,18 +26,29 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentAddPlaylistBinding
+import com.example.playlistmaker.ui.playlistadd.view_model.AddPlaylistViewModel
+import com.example.playlistmaker.util.UiMessageHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.markodevcic.peko.PermissionRequester
 import com.markodevcic.peko.PermissionResult
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
+
 
 class AddPlaylistFragment : Fragment() {
     private var _binding: FragmentAddPlaylistBinding? = null
     private val binding get() = _binding!!
     private val requester = PermissionRequester.instance()
+    private var coverImagePath: Uri? = null
+
+    private val viewModel by viewModel<AddPlaylistViewModel>()
+    private val uiMessageHelper: UiMessageHelper by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,9 +65,9 @@ class AddPlaylistFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
                     binding.bPhotoPicker.setImageURI(uri)
-                    saveImageToPrivateStorage(uri)
+                    coverImagePath = uri
                 } else {
-                    Log.d("PhotoPicker", "No media selected")
+                    Log.d("PhotoPicker", "Не выбрано изображение")
                 }
             }
 
@@ -115,19 +134,35 @@ class AddPlaylistFragment : Fragment() {
         }
 
         binding.bCreate.setOnClickListener {
+            val playlistName = binding.etPlaylistName.text.toString()
+            val playlistDescription =
+                binding.etPlaylistDescription.text.toString().takeIf { it.isNotBlank() }
 
+            coverImagePath?.let { saveImageToPrivateStorage(it, playlistName) }
+
+            viewModel.createPlaylist(
+                name = playlistName,
+                description = playlistDescription,
+                coverImagePath = coverImagePath.toString()
+            )
+
+            uiMessageHelper.showCustomSnackbar(
+                view = view,
+                message = "Плейлист ${playlistName} создан"
+            )
+
+            findNavController().navigateUp()
         }
-
-
     }
 
-    private fun saveImageToPrivateStorage(uri: Uri) {
+
+    private fun saveImageToPrivateStorage(uri: Uri, name: String) {
         val filePath =
-            File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
+            File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "covers")
         if (!filePath.exists()) {
             filePath.mkdirs()
         }
-        val file = File(filePath, "first_cover.jpg")
+        val file = File(filePath, "${name}.jpg")
         val inputStream = requireActivity().contentResolver.openInputStream(uri)
         val outputStream = FileOutputStream(file)
         BitmapFactory

@@ -7,12 +7,16 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayListBinding
 import com.example.playlistmaker.domain.entity.Playlist
 import com.example.playlistmaker.ui.library.adapter.PlaylistAdapter
 import com.example.playlistmaker.ui.library.view_model.PlayListViewModel
 import com.example.playlistmaker.ui.library.view_model.PlaylistState
+import com.example.playlistmaker.util.GridSpacingItemDecoration
+import com.example.playlistmaker.util.Utils
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -38,24 +42,40 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mbNewPlaylistButton.setOnClickListener{
+        binding.mbNewPlaylistButton.setOnClickListener {
             findNavController().navigate(
                 R.id.action_libraryFragment_to_addPlaylistFragment
             )
         }
 
-        viewModel.getFavoriteTracksState().observe(viewLifecycleOwner) { state ->
-            when(state){
+        viewModel.getPlaylistsState().observe(viewLifecycleOwner) { state ->
+            when (state) {
                 is PlaylistState.Content -> {
                     playlists.clear()
                     playlists.addAll(state.playlists)
                     playlistAdapter.notifyDataSetChanged()
                     showTracks()
                 }
+
                 is PlaylistState.Empty -> showPlaceholder()
             }
         }
 
+        binding.rvPlaylist.layoutManager =
+            GridLayoutManager(requireContext(), 2)
+        binding.rvPlaylist.addItemDecoration(
+            GridSpacingItemDecoration(
+                spanCount = 2,
+                spacing = Utils.dpToPx(8f, requireContext()),
+                false
+            )
+        )
+        binding.rvPlaylist.adapter = playlistAdapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getPlaylists()
     }
 
     private fun showPlaceholder() {

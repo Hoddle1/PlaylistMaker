@@ -1,14 +1,20 @@
 package com.example.playlistmaker.ui.library.adapter
 
+import android.net.Uri
+import android.os.Environment
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.entity.Playlist
 import com.example.playlistmaker.util.Utils
+import java.io.File
 
 class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val cover: ImageView = itemView.findViewById(R.id.ivCover)
@@ -17,16 +23,23 @@ class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(model: Playlist) {
         name.text = model.name
-        val tracksCountText = "${model.tracksCount} ${formatTracksCount(model.tracksCount)}"
+        val tracksCountText = formatTracksCount(model.tracksCount)
         tracksCount.text = tracksCountText
+
         Glide.with(itemView)
             .load(model.coverImagePath)
-            .fitCenter()
+            .apply(
+                RequestOptions()
+                    .centerCrop()
+                    .transform(
+                        MultiTransformation(
+                            CenterCrop(),
+                            RoundedCorners(Utils.dpToPx(8f, itemView.context))
+                        )
+                    )
+            )
             .placeholder(R.drawable.track_image_placeholder)
-            .centerCrop()
-            .transform(RoundedCorners(Utils.dpToPx(8f, itemView.context)))
             .into(cover)
-
 
     }
 
