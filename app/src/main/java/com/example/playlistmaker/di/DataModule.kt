@@ -10,6 +10,7 @@ import com.example.playlistmaker.data.impl.FavoriteTrackRepositoryImpl
 import com.example.playlistmaker.data.impl.PlaylistRepositoryImpl
 import com.example.playlistmaker.data.impl.TrackHistoryRepositoryImpl
 import com.example.playlistmaker.data.player.impl.MediaPlayerRepositoryImpl
+import com.example.playlistmaker.data.playlistadd.impl.PlaylistImageStorageRepositoryImpl
 import com.example.playlistmaker.data.search.NetworkClient
 import com.example.playlistmaker.data.search.impl.TracksSearchRepositoryImpl
 import com.example.playlistmaker.data.search.network.RetrofitClient
@@ -17,6 +18,7 @@ import com.example.playlistmaker.data.settings.impl.SettingsRepositoryImpl
 import com.example.playlistmaker.domain.db.FavoriteTrackRepository
 import com.example.playlistmaker.domain.db.PlaylistRepository
 import com.example.playlistmaker.domain.player.MediaPlayerRepository
+import com.example.playlistmaker.domain.playlistadd.PlaylistImageStorageRepository
 import com.example.playlistmaker.domain.search.TrackHistoryRepository
 import com.example.playlistmaker.domain.search.TracksSearchRepository
 import com.example.playlistmaker.domain.settings.SettingsRepository
@@ -92,6 +94,12 @@ val dataModule = module {
         PlaylistRepositoryImpl(
             playlistDbConverter = get(),
             appDatabase = get()
+        )
+    }
+
+    single<PlaylistImageStorageRepository> {
+        PlaylistImageStorageRepositoryImpl(
+           context = get()
         )
     }
 }

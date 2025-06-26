@@ -47,7 +47,8 @@ val uiModule = module {
 
     viewModel {
         AddPlaylistViewModel(
-            playlistInteractor = get()
+            playlistInteractor = get(),
+            playlistImageStorageInteractor = get()
         )
     }
 
