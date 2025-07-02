@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/libraryFragment"
-        android:name="com.example.playlistmaker.ui.library.fragment.LibraryFragment"
+        android:name="com.example.playlistmaker.presentation.ui.library.fragment.LibraryFragment"
         android:label="fragment_library"
         tools:layout="@layout/fragment_library">
         <action
@@ -17,14 +17,15 @@
             android:id="@+id/action_libraryFragment_to_addPlaylistFragment"
             app:destination="@id/addPlaylistFragment" />
     </fragment>
+
     <activity
         android:id="@+id/mediaPlayerActivity"
-        android:name="com.example.playlistmaker.ui.player.activity.MediaPlayerActivity"
+        android:name="com.example.playlistmaker.presentation.ui.player.activity.MediaPlayerActivity"
         android:label="activity_player"
         tools:layout="@layout/activity_player" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.playlistmaker.ui.search.fragment.SearchFragment"
+        android:name="com.example.playlistmaker.presentation.ui.search.fragment.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search">
         <action
@@ -33,12 +34,12 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.playlistmaker.ui.settings.fragment.SettingsFragment"
+        android:name="com.example.playlistmaker.presentation.ui.settings.fragment.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/addPlaylistFragment"
-        android:name="com.example.playlistmaker.ui.playlistadd.fragment.AddPlaylistFragment"
+        android:name="com.example.playlistmaker.presentation.ui.playlistadd.fragment.AddPlaylistFragment"
         android:label="fragment_add_playlist"
         tools:layout="@layout/fragment_add_playlist" />
 </navigation>

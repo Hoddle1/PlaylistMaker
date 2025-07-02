@@ -20,7 +20,7 @@ class App : Application() {
                 uiModule
             )
         }
-        applicationContext.deleteDatabase("database.db")
+//        applicationContext.deleteDatabase("database.db")
 
         val settingsInteractor: SettingsInteractor by inject()
         settingsInteractor.switchTheme(settingsInteractor.getTheme())

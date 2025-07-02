@@ -8,7 +8,7 @@ import com.example.playlistmaker.data.search.dto.TrackSearchResponse
 import com.example.playlistmaker.data.search.mapper.TrackSearchMapper
 import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.domain.search.TracksSearchRepository
-import com.example.playlistmaker.util.Resource
+import com.example.playlistmaker.presentation.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

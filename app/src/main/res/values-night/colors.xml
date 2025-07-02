@@ -21,7 +21,15 @@
     <color name="tab_library_color">#FFFFFF</color>
     <color name="bottom_navigation_item_inactive">#FFFFFF</color>
     <color name="bottom_navigation_background">#1A1B22</color>
-    <color name="border_edittext_playlist_add">#FFFFFF</color>
-
+    <color name="border_add_edittext_playlist_default">#FFFFFF</color>
+    <color name="header_bottom_sheet_text">#FFFFFF</color>
+    <color name="bottom_sheet_background">#1A1B22</color>
+    <color name="playlist_list_item_name">#FFFFFF</color>
+    <color name="playlist_list_item_count_tracks">#FFFFFF</color>
+    <color name="playlist_text_color">#FFFFFF</color>
+    <color name="toast_playlist_background_dqw">#FFFFFF</color>
+    <color name="toast_playlist_text">#1A1B22</color>
+    <color name="add_to_playlist_bottomsheet_header">#FFFFFF</color>
+    <color name="playlist_edittext">#FFFFFF</color>
 
 </resources>

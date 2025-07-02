@@ -10,17 +10,17 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 class FavoriteTrackInteractorImpl(private val repository: FavoriteTrackRepository) :
     FavoriteTrackInteractor {
-    private val _updates = MutableSharedFlow<Unit>()
-    override val favoritesUpdates: SharedFlow<Unit> = _updates.asSharedFlow()
+    private val updates = MutableSharedFlow<Unit>()
+    override val favoritesUpdates: SharedFlow<Unit> = updates.asSharedFlow()
 
     override suspend fun addFavoriteTrack(track: Track) {
         repository.addFavoriteTrack(track)
-        _updates.emit(Unit)
+        updates.emit(Unit)
     }
 
     override suspend fun deleteFavoriteTrack(track: Track) {
         repository.deleteFavoriteTrack(track)
-        _updates.emit(Unit)
+        updates.emit(Unit)
     }
 
     override fun getFavoriteTracks(): Flow<List<Track>> {
