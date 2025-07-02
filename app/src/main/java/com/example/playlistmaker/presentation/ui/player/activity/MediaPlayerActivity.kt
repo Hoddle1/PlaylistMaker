@@ -102,18 +102,17 @@ class MediaPlayerActivity : AppCompatActivity() {
             }
         })
 
+        viewModel.getPlaylistsLiveData().observe(this) { playlists ->
+            this.playlists.clear()
+            this.playlists.addAll(playlists)
+            playlistsAdapter.notifyDataSetChanged()
+        }
+
         viewModel.getBottomSheetState().observe(this) { state ->
             when (state) {
-                BottomSheetState.Hidden -> bottomSheetBehavior.state =
-                    BottomSheetBehavior.STATE_HIDDEN
-
-                is BottomSheetState.Collapsed -> {
-                    playlists.clear()
-                    playlists.addAll(state.playlists)
-                    playlistsAdapter.notifyDataSetChanged()
-
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
+                BottomSheetState.HIDDEN -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                BottomSheetState.COLLAPSED -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                else -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
 
@@ -127,15 +126,7 @@ class MediaPlayerActivity : AppCompatActivity() {
         }
 
         viewModel.getUiMessageState().observe(this) { message ->
-            uiMessageHelper.showCustomSnackbar(
-                view = view,
-                message = message
-            )
-        }
-
-        binding.overlay.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            viewModel.hideBottomSheet()
+            uiMessageHelper.showCustomSnackbar(message)
         }
 
         viewModel.preparePlayer(track.previewUrl)
@@ -196,6 +187,7 @@ class MediaPlayerActivity : AppCompatActivity() {
 
             iBtnQueue.setOnClickListener {
                 viewModel.getPlaylists()
+                viewModel.showBottomSheet()
             }
 
             mbNewPlaylistButton.setOnClickListener{
@@ -205,6 +197,10 @@ class MediaPlayerActivity : AppCompatActivity() {
                     .commit()
 
                 binding.fragmentContainer.visibility = View.VISIBLE
+            }
+
+            overlay.setOnClickListener {
+                viewModel.hideBottomSheet()
             }
 
             iBtnBack.setOnClickListener { finish() }

@@ -23,14 +23,14 @@ class MediaPlayerViewModel(
     private val uiTextProvider: UiTextProvider
 ) : ViewModel() {
 
-    private var mediaPlayerState = MutableLiveData<MediaPlayerState>(
-        MediaPlayerState.Default()
-    )
-
+    private var mediaPlayerState = MutableLiveData<MediaPlayerState>(MediaPlayerState.Default())
     fun getMediaPlayerState(): LiveData<MediaPlayerState> = mediaPlayerState
 
-    private val bottomSheetState = MutableLiveData<BottomSheetState>(BottomSheetState.Hidden)
+    private val bottomSheetState = MutableLiveData(BottomSheetState.HIDDEN)
     fun getBottomSheetState(): LiveData<BottomSheetState> = bottomSheetState
+
+    private val playlistsLiveData = MutableLiveData<List<Playlist>>()
+    fun getPlaylistsLiveData(): LiveData<List<Playlist>> = playlistsLiveData
 
     private val uiMessage = MutableLiveData<String>()
     fun getUiMessageState(): LiveData<String> = uiMessage
@@ -118,19 +118,18 @@ class MediaPlayerViewModel(
 
     fun getPlaylists() {
         viewModelScope.launch {
-            playlistInteractor.getPlaylists()
-                .collect { playlists ->
-                    bottomSheetState.postValue(
-                        BottomSheetState.Collapsed(
-                            playlists = playlists
-                        )
-                    )
-                }
+            playlistInteractor.getPlaylists().collect { playlists ->
+                playlistsLiveData.postValue(playlists)
+            }
         }
     }
 
+    fun showBottomSheet() {
+        bottomSheetState.postValue(BottomSheetState.COLLAPSED)
+    }
+
     fun hideBottomSheet() {
-        bottomSheetState.postValue(BottomSheetState.Hidden)
+        bottomSheetState.postValue(BottomSheetState.HIDDEN)
     }
 
     private fun startTimer() {
@@ -157,20 +156,13 @@ class MediaPlayerViewModel(
 
         viewModelScope.launch {
             val result = playlistInteractor.updatePlaylist(playlist, track)
-
             if (result) {
                 uiMessage.postValue(
-                    uiTextProvider.getString(
-                        R.string.track_added_in_playlist,
-                        playlist.name
-                    )
+                    uiTextProvider.getString(R.string.track_added_in_playlist, playlist.name)
                 )
+                hideBottomSheet()
             } else {
-                uiMessage.postValue(
-                    uiTextProvider.getString(
-                        R.string.unknown_error
-                    )
-                )
+                uiMessage.postValue(uiTextProvider.getString(R.string.unknown_error))
             }
         }
     }

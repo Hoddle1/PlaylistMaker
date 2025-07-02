@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.util
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -12,8 +13,9 @@ import com.example.playlistmaker.R
 import com.google.android.material.snackbar.Snackbar
 
 class UiMessageHelper(private val context: Context) {
-    fun showCustomSnackbar(view: View, message: String) {
-        val snackbar = Snackbar.make(view, "", Snackbar.LENGTH_LONG)
+    fun showCustomSnackbar(message: String) {
+        val activity  = context as? Activity ?: return
+        val snackbar = Snackbar.make(activity.findViewById(android.R.id.content), "", Snackbar.LENGTH_LONG)
             .setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT))
 
         val snackbarView = snackbar.view

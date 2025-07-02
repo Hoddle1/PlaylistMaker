@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
@@ -58,10 +59,10 @@ class AddPlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (isFromActivity) {
+        if (!isFromActivity) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.addPlaylistFragment) { v, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+                v.setPadding(0, 0, 0, systemBars.bottom)
                 insets
             }
         }
@@ -77,24 +78,14 @@ class AddPlaylistFragment : Fragment() {
             }
 
         binding.iBtnBack.setOnClickListener {
-            if (!binding.etPlaylistName.text.isNullOrEmpty() ||
-                !binding.etPlaylistDescription.text.isNullOrEmpty() ||
-                coverImagePath != null
-            ) {
-                context?.let { ctx ->
-                    MaterialAlertDialogBuilder(ctx)
-                        .setTitle(getString(R.string.dialog_finish_creating_playlist_title))
-                        .setMessage(getString(R.string.dialog_finish_creating_playlist_message))
-                        .setNeutralButton(getString(R.string.cansel)) { dialog, which -> }
-                        .setPositiveButton(getString(R.string.yes)) { dialog, which ->
-                            closeFragment()
-                        }
-                        .show()
-                }
-            } else {
-                closeFragment()
-            }
+            handleBackAction()
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackAction()
+            }
+        })
 
         binding.bPhotoPicker.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -136,8 +127,6 @@ class AddPlaylistFragment : Fragment() {
             }
         }
 
-
-
         binding.etPlaylistName.doOnTextChanged { s, _, _, _ ->
             binding.bCreate.isEnabled = !s.isNullOrEmpty()
         }
@@ -157,11 +146,28 @@ class AddPlaylistFragment : Fragment() {
                 coverImagePath = coverImage?.toString()
             )
 
-            uiMessageHelper.showCustomSnackbar(
-                view = view,
-                message = getString(R.string.playlist_added, playlistName)
-            )
+            uiMessageHelper.showCustomSnackbar(getString(R.string.playlist_added, playlistName))
 
+            closeFragment()
+        }
+    }
+
+    private fun handleBackAction() {
+        if (!binding.etPlaylistName.text.isNullOrEmpty() ||
+            !binding.etPlaylistDescription.text.isNullOrEmpty() ||
+            coverImagePath != null
+        ) {
+            context?.let { ctx ->
+                MaterialAlertDialogBuilder(ctx)
+                    .setTitle(getString(R.string.dialog_finish_creating_playlist_title))
+                    .setMessage(getString(R.string.dialog_finish_creating_playlist_message))
+                    .setNeutralButton(getString(R.string.cansel)) { dialog, which -> }
+                    .setPositiveButton(getString(R.string.yes)) { dialog, which ->
+                        closeFragment()
+                    }
+                    .show()
+            }
+        } else {
             closeFragment()
         }
     }
