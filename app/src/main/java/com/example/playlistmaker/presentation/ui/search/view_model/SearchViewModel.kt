@@ -83,6 +83,8 @@ class SearchViewModel(
 
         searchText = queryText
 
+        searchDebounceJob?.cancel()
+
         if (queryText.isEmpty()) {
             searchDebounceJob?.cancel()
             showHistory()
