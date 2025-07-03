@@ -2,12 +2,12 @@ package com.example.playlistmaker.presentation.ui.player.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.entity.Playlist
 
 
-class PlaylistsAdapter(private val playlists: List<Playlist>) : RecyclerView.Adapter<PlaylistsViewHolder>() {
+class PlaylistsAdapter: ListAdapter<Playlist, PlaylistsViewHolder>(PlaylistDiffCallback()) {
 
     var onItemClickListener: ((Playlist) -> Unit)? = null
 
@@ -16,14 +16,11 @@ class PlaylistsAdapter(private val playlists: List<Playlist>) : RecyclerView.Ada
         return PlaylistsViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return playlists.size
-    }
-
     override fun onBindViewHolder(holder: PlaylistsViewHolder, position: Int) {
-        holder.bind(playlists[position])
+        val playlist = getItem(position)
+        holder.bind(playlist)
         holder.itemView.setOnClickListener {
-            onItemClickListener?.invoke(playlists[position])
+            onItemClickListener?.invoke(playlist)
         }
     }
 

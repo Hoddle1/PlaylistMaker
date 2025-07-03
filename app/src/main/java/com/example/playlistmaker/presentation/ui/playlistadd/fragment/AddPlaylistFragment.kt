@@ -33,7 +33,7 @@ import org.koin.core.parameter.parametersOf
 
 class AddPlaylistFragment : Fragment() {
     private var _binding: FragmentAddPlaylistBinding? = null
-    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
+    private val binding get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
     private val requester = PermissionRequester.instance()
     private var coverImagePath: Uri? = null
     private var isFromActivity: Boolean = false

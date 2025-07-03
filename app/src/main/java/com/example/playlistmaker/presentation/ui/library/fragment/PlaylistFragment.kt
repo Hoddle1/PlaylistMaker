@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayListBinding
-import com.example.playlistmaker.domain.entity.Playlist
 import com.example.playlistmaker.presentation.ui.library.adapter.PlaylistAdapter
 import com.example.playlistmaker.presentation.ui.library.view_model.PlayListViewModel
 import com.example.playlistmaker.presentation.ui.library.view_model.PlaylistState
@@ -22,11 +21,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class PlaylistFragment : Fragment() {
     private var _binding: FragmentPlayListBinding? = null
 
-    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
+    private val binding
+        get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
 
-    private val playlists: MutableList<Playlist> = mutableListOf()
-
-    private val playlistAdapter = PlaylistAdapter(playlists)
+    private val playlistAdapter = PlaylistAdapter()
 
     private val viewModel by viewModel<PlayListViewModel>()
 
@@ -50,9 +48,7 @@ class PlaylistFragment : Fragment() {
         viewModel.getPlaylistsState().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is PlaylistState.Content -> {
-                    playlists.clear()
-                    playlists.addAll(state.playlists)
-                    playlistAdapter.notifyDataSetChanged()
+                    playlistAdapter.submitList(state.playlists)
                     showTracks()
                 }
 

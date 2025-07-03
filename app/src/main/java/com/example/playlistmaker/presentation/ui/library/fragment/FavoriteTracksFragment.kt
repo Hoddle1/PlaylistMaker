@@ -25,7 +25,7 @@ class FavoriteTracksFragment : Fragment() {
 
     private var _binding: FragmentFavoriteTracksBinding? = null
 
-    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
+    private val binding get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
 
     private val favoriteTracks: MutableList<Track> = mutableListOf()
 

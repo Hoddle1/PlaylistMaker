@@ -61,6 +61,7 @@
     <string name="permission_cancelled">Запрос разрешения был отменён. Вы можете попробовать снова, чтобы продолжить работу</string>
     <string name="playlist_added">Плейлист %1$s создан</string>
     <string name="image_name_512">512x512bb.jpg</string>
+    <string name="binding_is_null">Binding is null</string>
 
 
     <plurals name="tracks">

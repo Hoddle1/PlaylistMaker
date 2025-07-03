@@ -37,9 +37,7 @@ class MediaPlayerActivity : AppCompatActivity() {
 
     private val viewModel by viewModel<MediaPlayerViewModel>()
 
-    private val playlists: MutableList<Playlist> = mutableListOf()
-
-    private val playlistsAdapter = PlaylistsAdapter(playlists)
+    private val playlistsAdapter = PlaylistsAdapter()
 
     private val uiMessageHelper: UiMessageHelper by inject{ parametersOf(this)}
 
@@ -103,9 +101,7 @@ class MediaPlayerActivity : AppCompatActivity() {
         })
 
         viewModel.getPlaylistsLiveData().observe(this) { playlists ->
-            this.playlists.clear()
-            this.playlists.addAll(playlists)
-            playlistsAdapter.notifyDataSetChanged()
+            playlistsAdapter.submitList(playlists)
         }
 
         viewModel.getBottomSheetState().observe(this) { state ->
