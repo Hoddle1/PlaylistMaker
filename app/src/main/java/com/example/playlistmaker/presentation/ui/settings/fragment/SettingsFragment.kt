@@ -19,7 +19,7 @@ class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingsBinding? = null
 
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
 
     private val viewModel by viewModel<SettingsViewModel>()
 

@@ -26,7 +26,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
 
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
 
     private val tracks: MutableList<Track> = mutableListOf()
 

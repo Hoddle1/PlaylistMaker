@@ -151,7 +151,7 @@ class MediaPlayerActivity : AppCompatActivity() {
             }
 
             if (track.releaseDate == null) {
-                tvReleaseDateValue.isVisible = false
+                tvReleaseDateTitle.isVisible = false
                 tvReleaseDateValue.isVisible = false
             } else {
                 tvReleaseDateValue.text =
@@ -162,7 +162,7 @@ class MediaPlayerActivity : AppCompatActivity() {
             tvCountryValue.text = track.country
 
             Glide.with(this@MediaPlayerActivity)
-                .load(track.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
+                .load(track.artworkUrl100.replaceAfterLast('/', getString(R.string.image_name_512)))
                 .fitCenter()
                 .placeholder(R.drawable.track_image_placeholder)
                 .centerCrop()

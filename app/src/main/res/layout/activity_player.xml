@@ -164,7 +164,7 @@
                 app:layout_constraintTag="trackAlbumTitle" />
 
             <TextView
-                android:id="@+id/tvRreleaseDateTitle"
+                android:id="@+id/tvReleaseDateTitle"
                 style="@style/TrackContentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

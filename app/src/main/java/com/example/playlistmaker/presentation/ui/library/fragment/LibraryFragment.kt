@@ -15,7 +15,7 @@ class LibraryFragment : Fragment() {
 
     private var _binding: FragmentLibraryBinding? = null
 
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
 
     private lateinit var tabMediator: TabLayoutMediator
 

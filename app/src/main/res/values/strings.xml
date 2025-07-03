@@ -60,6 +60,7 @@
     <string name="permission_denied_permanently">Доступ к фото отключён навсегда. Пожалуйста, перейдите в настройки приложения и включите разрешение вручную.</string>
     <string name="permission_cancelled">Запрос разрешения был отменён. Вы можете попробовать снова, чтобы продолжить работу</string>
     <string name="playlist_added">Плейлист %1$s создан</string>
+    <string name="image_name_512">512x512bb.jpg</string>
 
 
     <plurals name="tracks">
