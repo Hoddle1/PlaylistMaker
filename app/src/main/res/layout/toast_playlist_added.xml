@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/custom_toast_playlist_added"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/toast_playlist_background_dqw">
+
+    <TextView
+        android:id="@+id/tvMessage"
+        style="@style/ToastText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+</FrameLayout>

@@ -1,10 +1,14 @@
 package com.example.playlistmaker.di
 
 import com.example.playlistmaker.domain.db.FavoriteTrackInteractor
+import com.example.playlistmaker.domain.db.PlaylistInteractor
 import com.example.playlistmaker.domain.impl.FavoriteTrackInteractorImpl
+import com.example.playlistmaker.domain.impl.PlaylistInteractorImpl
 import com.example.playlistmaker.domain.impl.TrackHistoryInteractorImpl
 import com.example.playlistmaker.domain.player.MediaPlayerInteractor
 import com.example.playlistmaker.domain.player.impl.MediaPlayerInteractorImpl
+import com.example.playlistmaker.domain.playlistadd.PlaylistImageStorageInteractor
+import com.example.playlistmaker.domain.playlistadd.impl.PlaylistImageStorageInteractorImpl
 import com.example.playlistmaker.domain.search.TrackHistoryInteractor
 import com.example.playlistmaker.domain.search.TracksSearchInteractor
 import com.example.playlistmaker.domain.search.impl.TracksSearchInteractorImpl
@@ -41,6 +45,18 @@ val domainModule = module {
 
     single<SettingsInteractor> {
         SettingsInteractorImpl(
+            repository = get()
+        )
+    }
+
+    single<PlaylistInteractor> {
+        PlaylistInteractorImpl(
+            repository = get()
+        )
+    }
+
+    single<PlaylistImageStorageInteractor> {
+        PlaylistImageStorageInteractorImpl(
             repository = get()
         )
     }
