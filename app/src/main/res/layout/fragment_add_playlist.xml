@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/default_background"
-    tools:context=".presentation.ui.playlistadd.fragment.AddPlaylistFragment">
+    tools:context=".presentation.ui.playlist_form.fragment.AddPlaylistFragment">
 
     <LinearLayout
         android:id="@+id/llHeader"
@@ -29,6 +29,7 @@
             app:tint="@color/header_text" />
 
         <TextView
+            android:id="@+id/tvTitle"
             style="@style/HeaderText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,6 +47,7 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/photo_picker"
+        android:contentDescription="@string/choose_cover"
         android:scaleType="centerCrop"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"

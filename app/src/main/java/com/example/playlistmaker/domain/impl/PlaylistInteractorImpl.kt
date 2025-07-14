@@ -19,7 +19,18 @@ class PlaylistInteractorImpl(private val repository: PlaylistRepository) : Playl
         updates.emit(Unit)
     }
 
-    override suspend fun updatePlaylist(playlist: Playlist, track: Track): Boolean {
+    override suspend fun updatePlaylist(playlist: Playlist): Boolean {
+        val result = repository.updatePlaylist(playlist)
+        updates.emit(Unit)
+        return result
+    }
+
+    override suspend fun deletePlaylist(playlistId: Int) {
+        repository.deletePlaylist(playlistId)
+        updates.emit(Unit)
+    }
+
+    override suspend fun insertTrackToPlaylist(playlist: Playlist, track: Track): Boolean {
         val updatedTrackIds = playlist.trackIds.toMutableList()
         updatedTrackIds.add(track.trackId)
 
@@ -28,18 +39,38 @@ class PlaylistInteractorImpl(private val repository: PlaylistRepository) : Playl
             tracksCount = updatedTrackIds.size
         )
 
-        val result = repository.updatePlaylist(updatedPlaylist, track)
+        val result = repository.insertTrackToPlaylist(updatedPlaylist, track)
         updates.emit(Unit)
         return result
     }
 
-    override suspend fun deletePlaylist(playlist: Playlist) {
-        repository.deletePlaylist(playlist)
+    override suspend fun removeTrackFromPlaylist(playlistId: Int, track: Track): Playlist? {
+        val playlist = repository.getPlaylistById(playlistId)
+
+        val updatedTrackIds = playlist.trackIds.toMutableList().apply {
+            remove(track.trackId)
+        }
+
+        val updatedPlaylist = playlist.copy(
+            trackIds = updatedTrackIds,
+            tracksCount = updatedTrackIds.size
+        )
+
+        val result = repository.removeTrackFromPlaylist(updatedPlaylist, track)
         updates.emit(Unit)
+        return result
+    }
+
+    override fun getTracksForPlaylist(trackIds: List<Int>): Flow<List<Track>> {
+        return repository.getTracksForPlaylist(trackIds)
     }
 
     override fun getPlaylists(): Flow<List<Playlist>> {
         return repository.getPlaylists()
+    }
+
+    override suspend fun getPlaylistById(id: Int): Playlist {
+        return repository.getPlaylistById(id)
     }
 
 }

@@ -222,8 +222,6 @@ class SearchFragment : Fragment() {
         binding.trackHistoryContainer.isVisible = false
     }
 
-
-
     companion object {
         private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
     }

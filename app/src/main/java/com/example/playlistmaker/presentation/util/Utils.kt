@@ -23,6 +23,16 @@ object Utils {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(millis)
     }
 
+    fun convertTimeToMillis(time: String): Int {
+        val parts = time.split(":")
+        if (parts.size != 2) throw IllegalArgumentException("Time format must be mm:ss")
+
+        val minutes = parts[0].toIntOrNull() ?: throw IllegalArgumentException("Invalid minutes value")
+        val seconds = parts[1].toIntOrNull() ?: throw IllegalArgumentException("Invalid seconds value")
+
+        return (minutes * 60 + seconds) * 1000
+    }
+
     fun <T> debounce(
         delayMillis: Long,
         coroutineScope: CoroutineScope,

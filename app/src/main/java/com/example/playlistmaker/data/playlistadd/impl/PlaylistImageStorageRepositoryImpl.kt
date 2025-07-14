@@ -15,7 +15,8 @@ class PlaylistImageStorageRepositoryImpl(private val context: Context) : Playlis
             val filePath =
                 File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "covers")
             if (!filePath.exists()) filePath.mkdirs()
-            val file = File(filePath, "$name.jpg")
+            val fileName = File(uri.path!!).name
+            val file = File(filePath, "$fileName.jpg")
             val inputStream = context.contentResolver.openInputStream(uri)
             val outputStream = FileOutputStream(file)
             BitmapFactory.decodeStream(inputStream)

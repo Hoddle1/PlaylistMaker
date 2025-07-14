@@ -20,7 +20,7 @@ import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.presentation.ui.player.adapter.PlaylistsAdapter
 import com.example.playlistmaker.presentation.ui.player.view_model.BottomSheetState
 import com.example.playlistmaker.presentation.ui.player.view_model.MediaPlayerViewModel
-import com.example.playlistmaker.presentation.ui.playlistadd.fragment.AddPlaylistFragment
+import com.example.playlistmaker.presentation.ui.playlist_form.fragment.AddPlaylistFragment
 import com.example.playlistmaker.presentation.util.UiMessageHelper
 import com.example.playlistmaker.presentation.util.Utils
 import com.example.playlistmaker.presentation.util.Utils.debounce

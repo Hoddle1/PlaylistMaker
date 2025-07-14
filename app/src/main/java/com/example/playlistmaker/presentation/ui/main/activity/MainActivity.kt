@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.addPlaylistFragment -> {
+                R.id.addPlaylistFragment, R.id.playlistFragment, R.id.editPlaylistFragment -> {
                     binding.layoutBottomNavigation.visibility = View.GONE
                 }
                 else -> {
