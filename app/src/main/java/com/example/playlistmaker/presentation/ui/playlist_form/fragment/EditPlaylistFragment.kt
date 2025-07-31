@@ -43,18 +43,15 @@ class EditPlaylistFragment : BasePlaylistFragment() {
 
         binding.etPlaylistName.setText(playlist.name)
         binding.etPlaylistDescription.setText(playlist.description)
-//        playlist.coverImagePath?.let {
-//            binding.bPhotoPicker.setImageURI(Uri.parse(it))
-//        }
     }
 
     override fun onSaveClicked() {
         val updatedName = binding.etPlaylistName.text.toString()
         val updatedDescription =
             binding.etPlaylistDescription.text.toString().takeIf { it.isNotBlank() }
-        val updatedCover = coverImagePath?.let {
-            viewModel.saveCoverImage(it, updatedName).toString()
-        } ?: playlist.coverImagePath
+        val updatedCover =
+            coverImagePath?.let { viewModel.saveCoverImage(it, updatedName).toString() }
+                ?: playlist.coverImagePath
 
         viewModel.savePlaylist(
             name = updatedName,
