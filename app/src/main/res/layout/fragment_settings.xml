@@ -44,7 +44,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/mbShareApp"
-            style="@style/SettingsMenuItem"
+            style="@style/MenuItem"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/share_app"
@@ -52,7 +52,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/mbSendSupport"
-            style="@style/SettingsMenuItem"
+            style="@style/MenuItem"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/write_to_support"
@@ -60,7 +60,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/mbUserAgreement"
-            style="@style/SettingsMenuItem"
+            style="@style/MenuItem"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/agreement"

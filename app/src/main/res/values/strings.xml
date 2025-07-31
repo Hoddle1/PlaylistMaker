@@ -62,6 +62,17 @@
     <string name="playlist_added">Плейлист %1$s создан</string>
     <string name="image_name_512">512x512bb.jpg</string>
     <string name="binding_is_null">Binding is null</string>
+    <string name="playlist_no_tracks">В этом плейлисте нет треков</string>
+    <string name="want_delete_track">Хотите удалить трек?</string>
+    <string name="share">Поделиться</string>
+    <string name="edit_information">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+    <string name="want_delete_playlist">Хотите удалить плейлист «%1$s»?</string>
+    <string name="edit_playlist_header">Редактировать</string>
+    <string name="save_playlist">Сохранить</string>
+    <string name="no">Нет</string>
+    <string name="menu">Меню</string>
+    <string name="choose_cover">Выбор обложки</string>
 
 
     <plurals name="tracks">
@@ -69,5 +80,12 @@
         <item quantity="few">%d трека</item>
         <item quantity="many">%d треков</item>
         <item quantity="other">%d элементов</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+        <item quantity="other">%d минут</item>
     </plurals>
 </resources>

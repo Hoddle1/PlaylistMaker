@@ -155,7 +155,7 @@ class MediaPlayerViewModel(
         }
 
         viewModelScope.launch {
-            val result = playlistInteractor.updatePlaylist(playlist, track)
+            val result = playlistInteractor.insertTrackToPlaylist(playlist, track)
             if (result) {
                 uiMessage.postValue(
                     uiTextProvider.getString(R.string.track_added_in_playlist, playlist.name)

@@ -2,9 +2,11 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import com.example.playlistmaker.presentation.ui.library.view_model.FavoriteTracksViewModel
-import com.example.playlistmaker.presentation.ui.library.view_model.PlayListViewModel
+import com.example.playlistmaker.presentation.ui.library.view_model.PlaylistsLibraryViewModel
 import com.example.playlistmaker.presentation.ui.player.view_model.MediaPlayerViewModel
-import com.example.playlistmaker.presentation.ui.playlistadd.view_model.AddPlaylistViewModel
+import com.example.playlistmaker.presentation.ui.playlist.view_model.PlaylistViewModel
+import com.example.playlistmaker.presentation.ui.playlist_form.view_model.AddPlaylistViewModel
+import com.example.playlistmaker.presentation.ui.playlist_form.view_model.EditPlaylistViewModel
 import com.example.playlistmaker.presentation.ui.search.view_model.SearchViewModel
 import com.example.playlistmaker.presentation.ui.settings.view_model.SettingsViewModel
 import com.example.playlistmaker.presentation.util.UiMessageHelper
@@ -22,7 +24,7 @@ val uiModule = module {
     }
 
     viewModel {
-        PlayListViewModel(
+        PlaylistsLibraryViewModel(
             playlistInteractor = get()
         )
     }
@@ -54,6 +56,19 @@ val uiModule = module {
         AddPlaylistViewModel(
             playlistInteractor = get(),
             playlistImageStorageInteractor = get()
+        )
+    }
+
+    viewModel {
+        EditPlaylistViewModel(
+            playlistInteractor = get(),
+            playlistImageStorageInteractor = get()
+        )
+    }
+
+    viewModel {
+        PlaylistViewModel(
+            playlistInteractor = get()
         )
     }
 
