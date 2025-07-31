@@ -2,6 +2,7 @@ package com.example.playlistmaker.presentation.ui.playlist.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,8 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -22,8 +25,8 @@ import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.presentation.ui.player.activity.MediaPlayerActivity
 import com.example.playlistmaker.presentation.ui.playlist.adapter.TracksAdapter
 import com.example.playlistmaker.presentation.ui.playlist.entity.ShareEvent
-import com.example.playlistmaker.presentation.ui.playlist.view_model.PlaylistViewModel
 import com.example.playlistmaker.presentation.ui.playlist.entity.UiEvent
+import com.example.playlistmaker.presentation.ui.playlist.view_model.PlaylistViewModel
 import com.example.playlistmaker.presentation.ui.playlist_form.fragment.EditPlaylistFragment
 import com.example.playlistmaker.presentation.util.UiMessageHelper
 import com.example.playlistmaker.presentation.util.Utils.debounce
@@ -61,6 +64,9 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val insets = ViewCompat.getRootWindowInsets(binding.root)
+            ?.getInsets(WindowInsetsCompat.Type.systemBars())
+
         val playlistId = requireArguments().getInt(PLAYLIST_ID)
         viewModel.loadPlaylist(playlistId)
 
@@ -78,25 +84,40 @@ class PlaylistFragment : Fragment() {
             viewModel.showDeleteDialog(track, getString(R.string.want_delete_track))
         }
 
-        BottomSheetBehavior.from(binding.flBottomSheetTracks).apply {
-            peekHeight = 500
-            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                        state = BottomSheetBehavior.STATE_COLLAPSED
+        val bottomSheetBehaviorTracks =
+            BottomSheetBehavior.from(binding.flBottomSheetTracks).apply {
+
+
+                addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                    override fun onStateChanged(bottomSheet: View, newState: Int) {
+                        if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                            state = BottomSheetBehavior.STATE_COLLAPSED
+                        }
+
+                        if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                            tracksSlideOffset = 0f
+                            updateOverlay()
+                        }
                     }
 
-                    if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                        tracksSlideOffset = 0f
+                    override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                        tracksSlideOffset = slideOffset.coerceIn(0f, 1f)
                         updateOverlay()
                     }
-                }
+                })
+            }
 
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    tracksSlideOffset = slideOffset.coerceIn(0f, 1f)
-                    updateOverlay()
-                }
-            })
+        binding.iBtnShare.post {
+            val targetElement = binding.iBtnShare.bottom
+            Log.i("targetElement", targetElement.toString())
+            val screenHeight = resources.displayMetrics.heightPixels
+            Log.i("screenHeight", screenHeight.toString())
+            val peekHeight =
+                screenHeight - targetElement - (insets?.top ?: 0) - (insets?.bottom
+                    ?: 0)
+            Log.i("mypeekHeight", peekHeight.toString())
+            bottomSheetBehaviorTracks.peekHeight = maxOf(peekHeight, MIN_PEEK_HEIGHT)
+            bottomSheetBehaviorTracks.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
         val bottomSheetBehaviorMenu = BottomSheetBehavior.from(binding.flBottomSheetMenu).apply {
@@ -218,6 +239,7 @@ class PlaylistFragment : Fragment() {
         }
 
         binding.mbShare.setOnClickListener {
+
             viewModel.sharePlaylist()
             bottomSheetBehaviorMenu.state = BottomSheetBehavior.STATE_HIDDEN
         }
@@ -310,6 +332,7 @@ class PlaylistFragment : Fragment() {
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
+        private const val MIN_PEEK_HEIGHT = 200
 
         private const val PLAYLIST_ID = "PLAYLIST_ID"
 
