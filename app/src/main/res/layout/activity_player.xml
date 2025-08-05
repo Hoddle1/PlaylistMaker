@@ -3,9 +3,9 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/svMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/svMain"
     android:background="@color/default_background"
     tools:context=".presentation.ui.player.activity.MediaPlayerActivity">
 
@@ -103,18 +103,17 @@
                 app:layout_constraintStart_toEndOf="@id/startBorder"
                 app:layout_constraintTop_toTopOf="@id/iBtnPlay" />
 
-            <ImageButton
+
+            <com.example.playlistmaker.presentation.ui.player.view.PlaybackButtonView
                 android:id="@+id/iBtnPlay"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginTop="32dp"
-                android:backgroundTint="@color/transparent"
-                android:contentDescription="@string/play"
-                android:enabled="false"
-                android:src="@drawable/play_button"
                 app:layout_constraintEnd_toStartOf="@id/iBtnFavorite"
                 app:layout_constraintStart_toEndOf="@id/iBtnQueue"
-                app:layout_constraintTop_toBottomOf="@+id/artistName" />
+                app:layout_constraintTop_toBottomOf="@+id/artistName"
+                app:pauseIcon="@drawable/stop_button"
+                app:playIcon="@drawable/play_button" />
 
             <ImageButton
                 android:id="@+id/iBtnFavorite"

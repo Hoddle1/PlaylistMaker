@@ -19,6 +19,7 @@ import com.example.playlistmaker.domain.entity.Playlist
 import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.presentation.ui.player.adapter.PlaylistsAdapter
 import com.example.playlistmaker.presentation.ui.player.view_model.BottomSheetState
+import com.example.playlistmaker.presentation.ui.player.view_model.MediaPlayerState
 import com.example.playlistmaker.presentation.ui.player.view_model.MediaPlayerViewModel
 import com.example.playlistmaker.presentation.ui.playlist_form.fragment.AddPlaylistFragment
 import com.example.playlistmaker.presentation.util.UiMessageHelper
@@ -39,7 +40,7 @@ class MediaPlayerActivity : AppCompatActivity() {
 
     private val playlistsAdapter = PlaylistsAdapter()
 
-    private val uiMessageHelper: UiMessageHelper by inject{ parametersOf(this)}
+    private val uiMessageHelper: UiMessageHelper by inject { parametersOf(this) }
 
     private lateinit var onPlaylistClickDebounce: (Playlist) -> Unit
 
@@ -106,14 +107,18 @@ class MediaPlayerActivity : AppCompatActivity() {
 
         viewModel.getBottomSheetState().observe(this) { state ->
             when (state) {
-                BottomSheetState.HIDDEN -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                BottomSheetState.COLLAPSED -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                BottomSheetState.HIDDEN -> bottomSheetBehavior.state =
+                    BottomSheetBehavior.STATE_HIDDEN
+
+                BottomSheetState.COLLAPSED -> bottomSheetBehavior.state =
+                    BottomSheetBehavior.STATE_COLLAPSED
+
                 else -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
 
         viewModel.getMediaPlayerState().observe(this) { state ->
-            binding.iBtnPlay.setImageResource(state.imageResource)
+            binding.iBtnPlay.setPlaying(state is MediaPlayerState.Playing)
             binding.tvCurrentTrackTime.text = state.progress
         }
 
@@ -173,7 +178,7 @@ class MediaPlayerActivity : AppCompatActivity() {
                 .into(ivCover)
 
 
-            iBtnPlay.setOnClickListener {
+            iBtnPlay.onToggleClick = {
                 viewModel.playbackControl()
             }
 
@@ -186,7 +191,7 @@ class MediaPlayerActivity : AppCompatActivity() {
                 viewModel.showBottomSheet()
             }
 
-            mbNewPlaylistButton.setOnClickListener{
+            mbNewPlaylistButton.setOnClickListener {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, AddPlaylistFragment.newInstance())
                     .addToBackStack(null)
