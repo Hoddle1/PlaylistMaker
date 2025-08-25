@@ -1,10 +1,19 @@
 package com.example.playlistmaker.presentation.ui.player.activity
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -25,6 +34,7 @@ import com.example.playlistmaker.presentation.ui.playlist_form.fragment.AddPlayl
 import com.example.playlistmaker.presentation.util.UiMessageHelper
 import com.example.playlistmaker.presentation.util.Utils
 import com.example.playlistmaker.presentation.util.Utils.debounce
+import com.example.playlistmaker.services.MusicService
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -44,6 +54,19 @@ class MediaPlayerActivity : AppCompatActivity() {
 
     private lateinit var onPlaylistClickDebounce: (Playlist) -> Unit
 
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicService.MusicServiceBinder
+            viewModel.setAudioPlayerControl(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            viewModel.removeAudioPlayerControl()
+        }
+    }
+    private val requestPostNotificationsPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -59,10 +82,21 @@ class MediaPlayerActivity : AppCompatActivity() {
             insets
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                requestPostNotificationsPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             intent.getParcelableExtra(TRACK_DATA, Track::class.java)!!
         else
             (intent.getParcelableExtra(TRACK_DATA) as? Track)!!
+
+        bindMusicService(track.previewUrl, track.artistName, track.trackName)
 
         onPlaylistClickDebounce = debounce(
             CLICK_DEBOUNCE_DELAY_MILLIS,
@@ -129,8 +163,6 @@ class MediaPlayerActivity : AppCompatActivity() {
         viewModel.getUiMessageState().observe(this) { message ->
             uiMessageHelper.showCustomSnackbar(message)
         }
-
-        viewModel.preparePlayer(track.previewUrl)
 
         setFavoriteButton(track.isFavorite)
 
@@ -208,6 +240,11 @@ class MediaPlayerActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.stopForeground()
+    }
+
     private fun setFavoriteButton(isFavorite: Boolean) {
         binding.iBtnFavorite.setImageResource(
             if (isFavorite) {
@@ -218,9 +255,29 @@ class MediaPlayerActivity : AppCompatActivity() {
         )
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.pausePlayer()
+    private fun bindMusicService(songUrl: String, artistName: String, trackName: String) {
+        val intent = Intent(this, MusicService::class.java).apply {
+            putExtra("song_url", songUrl)
+            putExtra("artist_name", artistName)
+            putExtra("track_name", trackName)
+        }
+
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun unbindMusicService() {
+        unbindService(serviceConnection)
+    }
+
+    override fun onStop() {
+        Log.i("ACTIVITY", "onStop")
+        viewModel.startForeground()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        unbindMusicService()
+        super.onDestroy()
     }
 
     companion object {
