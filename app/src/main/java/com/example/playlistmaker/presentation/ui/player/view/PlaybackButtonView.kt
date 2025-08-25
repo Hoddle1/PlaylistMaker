@@ -43,6 +43,12 @@ class PlaybackButtonView @JvmOverloads constructor(
         }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        playBitmap?.recycle()
+        pauseBitmap?.recycle()
+    }
+
     fun setPlaying(isPlaying: Boolean) {
         this.isPlaying = isPlaying
         invalidate()
