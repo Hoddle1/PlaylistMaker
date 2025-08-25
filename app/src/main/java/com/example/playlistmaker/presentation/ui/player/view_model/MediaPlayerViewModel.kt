@@ -9,15 +9,11 @@ import com.example.playlistmaker.domain.db.FavoriteTrackInteractor
 import com.example.playlistmaker.domain.db.PlaylistInteractor
 import com.example.playlistmaker.domain.entity.Playlist
 import com.example.playlistmaker.domain.entity.Track
-import com.example.playlistmaker.domain.player.MediaPlayerInteractor
 import com.example.playlistmaker.presentation.util.UiTextProvider
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 class MediaPlayerViewModel(
-    private val mediaPlayerInteractor: MediaPlayerInteractor,
     private val favoriteTrackInteractor: FavoriteTrackInteractor,
     private val playlistInteractor: PlaylistInteractor,
     private val uiTextProvider: UiTextProvider
@@ -64,6 +60,17 @@ class MediaPlayerViewModel(
 
     fun removeAudioPlayerControl() {
         audioPlayerControl = null
+    }
+
+    fun startForeground() {
+        val state = mediaPlayerState.value
+        if (state is MediaPlayerState.Playing) {
+            audioPlayerControl?.startForeground()
+        }
+    }
+
+    fun stopForeground() {
+        audioPlayerControl?.stopForeground()
     }
 
     override fun onCleared() {

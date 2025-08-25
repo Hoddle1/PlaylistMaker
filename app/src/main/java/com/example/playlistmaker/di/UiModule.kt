@@ -31,7 +31,6 @@ val uiModule = module {
 
     viewModel {
         MediaPlayerViewModel(
-            mediaPlayerInteractor = get(),
             favoriteTrackInteractor = get(),
             playlistInteractor = get(),
             uiTextProvider = get()

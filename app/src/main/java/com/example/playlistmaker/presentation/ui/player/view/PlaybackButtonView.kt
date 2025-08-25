@@ -26,7 +26,6 @@ class PlaybackButtonView @JvmOverloads constructor(
 
     var onToggleClick: (() -> Unit)? = null
 
-
     init {
         context.theme.obtainStyledAttributes(
             attrs,
