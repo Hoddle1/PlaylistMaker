@@ -38,7 +38,7 @@ class MediaPlayerViewModel(
     private var isFavorite = MutableLiveData<Boolean>()
     fun getIsFavorite(): LiveData<Boolean> = isFavorite
 
-    private var timerJob: Job? = null
+    private var audioPlayerControl: AudioPlayerControl? = null
 
     init {
         observePlaylistsUpdates()
@@ -52,27 +52,40 @@ class MediaPlayerViewModel(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        releasePlayer()
+    fun setAudioPlayerControl(audioPlayerControl: AudioPlayerControl) {
+        this.audioPlayerControl = audioPlayerControl
+
+        viewModelScope.launch {
+            audioPlayerControl.getPlayerState().collect {
+                mediaPlayerState.postValue(it)
+            }
+        }
     }
 
-    fun preparePlayer(url: String) {
-        mediaPlayerInteractor.preparePlayer(
-            url = url,
-            onPrependListener = {
-                mediaPlayerState.postValue(MediaPlayerState.Prepared())
-            },
-            onCompletionListener = {
-                timerJob?.cancel()
-                mediaPlayerInteractor.seekTo(0)
-                mediaPlayerState.postValue(MediaPlayerState.Prepared())
+    fun removeAudioPlayerControl() {
+        audioPlayerControl = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayerControl = null
+    }
+
+    fun playbackControl() {
+        when (mediaPlayerState.value) {
+            is MediaPlayerState.Paused, is MediaPlayerState.Prepared -> {
+                audioPlayerControl?.startPlayer()
             }
-        )
+
+            is MediaPlayerState.Playing -> {
+                audioPlayerControl?.pausePlayer()
+            }
+
+            else -> {}
+        }
     }
 
     fun onFavoriteClicked(track: Track) {
-
         viewModelScope.launch {
             if (track.isFavorite) {
                 favoriteTrackInteractor.deleteFavoriteTrack(track)
@@ -83,37 +96,6 @@ class MediaPlayerViewModel(
         val newFavoriteState = !track.isFavorite
         track.isFavorite = newFavoriteState
         isFavorite.postValue(newFavoriteState)
-    }
-
-    private fun startPlayer() {
-        mediaPlayerInteractor.startPlayer()
-        mediaPlayerState.value = MediaPlayerState.Playing(mediaPlayerInteractor.getPlayerTime())
-        startTimer()
-    }
-
-    fun pausePlayer() {
-        mediaPlayerInteractor.pausePlayer()
-        timerJob?.cancel()
-        mediaPlayerState.postValue(MediaPlayerState.Paused(mediaPlayerInteractor.getPlayerTime()))
-    }
-
-    private fun releasePlayer() {
-        mediaPlayerInteractor.releasePlayer()
-        mediaPlayerState.value = MediaPlayerState.Default()
-    }
-
-    fun playbackControl() {
-        when (mediaPlayerState.value) {
-            is MediaPlayerState.Paused, is MediaPlayerState.Prepared -> {
-                startPlayer()
-            }
-
-            is MediaPlayerState.Playing -> {
-                pausePlayer()
-            }
-
-            else -> {}
-        }
     }
 
     fun getPlaylists() {
@@ -130,15 +112,6 @@ class MediaPlayerViewModel(
 
     fun hideBottomSheet() {
         bottomSheetState.postValue(BottomSheetState.HIDDEN)
-    }
-
-    private fun startTimer() {
-        timerJob = viewModelScope.launch {
-            while (mediaPlayerState.value is MediaPlayerState.Playing) {
-                delay(DELAY_MILLIS)
-                mediaPlayerState.postValue(MediaPlayerState.Playing(mediaPlayerInteractor.getPlayerTime()))
-            }
-        }
     }
 
     fun addTrackToPlaylist(playlist: Playlist, track: Track) {
@@ -165,9 +138,5 @@ class MediaPlayerViewModel(
                 uiMessage.postValue(uiTextProvider.getString(R.string.unknown_error))
             }
         }
-    }
-
-    companion object {
-        private const val DELAY_MILLIS = 500L
     }
 }
