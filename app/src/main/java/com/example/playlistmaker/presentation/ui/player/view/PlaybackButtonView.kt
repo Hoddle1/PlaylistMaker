@@ -26,7 +26,6 @@ class PlaybackButtonView @JvmOverloads constructor(
 
     var onToggleClick: (() -> Unit)? = null
 
-
     init {
         context.theme.obtainStyledAttributes(
             attrs,
@@ -41,6 +40,12 @@ class PlaybackButtonView @JvmOverloads constructor(
                 recycle()
             }
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        playBitmap?.recycle()
+        pauseBitmap?.recycle()
     }
 
     fun setPlaying(isPlaying: Boolean) {
