@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.ui.search.view_model
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,9 @@ import com.example.playlistmaker.domain.search.TrackHistoryInteractor
 import com.example.playlistmaker.domain.search.TracksSearchInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -19,10 +23,14 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private val trackListState = MutableLiveData<TrackListState>()
-    private var searchText = ""
+    fun getTrackListState(): LiveData<TrackListState> = trackListState
+
+    private val _searchText = MutableStateFlow("")
+    val searchText: StateFlow<String> = _searchText.asStateFlow()
+
     private var searchDebounceJob: Job? = null
 
-    fun getTrackListState(): LiveData<TrackListState> = trackListState
+
 
     init {
         observeFavoriteUpdates()
@@ -32,7 +40,7 @@ class SearchViewModel(
         viewModelScope.launch {
             favoriteTrackInteractor.favoritesUpdates.collect {
                 if (trackListState.value is TrackListState.Content) {
-                    search(searchText)
+                    search(_searchText.value)
                 }
                 else if (trackListState.value is TrackListState.History) {
                     showHistory()
@@ -58,6 +66,7 @@ class SearchViewModel(
     private fun processResult(foundNames: List<Track>?, errorMessage: String?) {
         val tracks = mutableListOf<Track>()
         if (foundNames != null) {
+            Log.i("text", tracks.toString())
             tracks.addAll(foundNames)
         }
 
@@ -79,9 +88,9 @@ class SearchViewModel(
     }
 
     fun onTextChange(queryText: String) {
-        if (searchText == queryText) return
+        if (_searchText.value == queryText) return
 
-        searchText = queryText
+        _searchText.value = queryText
 
         searchDebounceJob?.cancel()
 
@@ -91,7 +100,7 @@ class SearchViewModel(
         } else {
             searchDebounceJob = viewModelScope.launch {
                 delay(SEARCH_DEBOUNCE_DELAY_MILLIS)
-                search(searchText)
+                search(_searchText.value)
             }
         }
     }

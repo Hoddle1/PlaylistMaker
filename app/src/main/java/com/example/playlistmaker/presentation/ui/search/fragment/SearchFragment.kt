@@ -5,28 +5,44 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.presentation.ui.player.activity.MediaPlayerActivity
 import com.example.playlistmaker.presentation.ui.search.adapter.TrackAdapter
+import com.example.playlistmaker.presentation.ui.search.components.SearchField
 import com.example.playlistmaker.presentation.ui.search.view_model.ErrorSearchStatus
 import com.example.playlistmaker.presentation.ui.search.view_model.SearchViewModel
-import com.example.playlistmaker.presentation.ui.search.view_model.TrackListState
-
-import com.example.playlistmaker.presentation.util.Utils.debounce
+import com.example.playlistmaker.presentation.ui.theme.Fonts
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
 
-    private val binding get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
+    private val binding
+        get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
 
     private val tracks: MutableList<Track> = mutableListOf()
 
@@ -44,91 +60,141 @@ class SearchFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+            setContent {
+                val searchText = viewModel.searchText.collectAsState()
+
+                Scaffold(
+                    backgroundColor = Color(LocalContext.current.getColor(R.color.default_background))
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                    ) {
+                        Header()
+
+                        SearchField(
+                            value = searchText.value,
+                            onValueChange = { text ->
+                                viewModel.onTextChange(text)
+                            },
+                            onClear = {
+                                clearSearchText()
+//                                binding.tracksList.isVisible = false
+//                                tracks.clear()
+//                                trackAdapter.notifyDataSetChanged()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun Header() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp)
+
+        ) {
+            Text(
+                text = LocalContext.current.getString(R.string.settings),
+                color = Color(LocalContext.current.getColor(R.color.settings_text_button)),
+                fontWeight = FontWeight.W500,
+                fontFamily = Fonts.YSDisplay,
+                fontSize = 22.sp
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        onTrackClickDebounce = debounce(
-            CLICK_DEBOUNCE_DELAY_MILLIS,
-            viewLifecycleOwner.lifecycleScope,
-            false
-        ) { track ->
-            viewModel.saveTrack(track)
-            startPlayerActivity(track)
-        }
-
-        trackAdapter.onItemClickListener = { onTrackClickDebounce(it) }
-
-        trackHistoryAdapter.onItemClickListener = { onTrackClickDebounce(it) }
-
-        binding.clearIcon.setOnClickListener {
-            clearSearchText()
-            binding.tracksList.isVisible = false
-            tracks.clear()
-            trackAdapter.notifyDataSetChanged()
-        }
-
-        binding.queryInput.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && binding.queryInput.text.isEmpty()) {
-                viewModel.queryInputOnFocused()
-            }
-        }
-
-        binding.btnPlaceholder.setOnClickListener {
-            viewModel.search(binding.queryInput.text.toString())
-        }
-
-        binding.clearHistoryButton.setOnClickListener {
-            binding.trackHistoryContainer.isVisible = false
-            tracksHistory.clear()
-            trackHistoryAdapter.notifyDataSetChanged()
-            viewModel.clearHistory()
-        }
-
-        binding.queryInput.doOnTextChanged { s, _, _, _ ->
-            binding.clearIcon.isVisible = !s.isNullOrEmpty()
-            viewModel.onTextChange(s.toString())
-        }
-
-        binding.tracksList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.tracksList.adapter = trackAdapter
-
-        binding.historyList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.historyList.adapter = trackHistoryAdapter
-
-        viewModel.getTrackListState().observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is TrackListState.Content -> {
-                    tracks.clear()
-                    tracks.addAll(state.tracks)
-                    trackAdapter.notifyDataSetChanged()
-                    showTracks()
-                }
-
-                is TrackListState.Error -> {
-                    showError(state.status)
-                }
-
-                is TrackListState.History -> {
-                    updateTrackHistoryList(state.tracks)
-                    if (tracksHistory.isNotEmpty()) {
-                        showHistory()
-                    } else {
-                        hideAll()
-                    }
-
-                }
-
-                TrackListState.Loading -> {
-                    showProgress()
-                }
-            }
-        }
+//        onTrackClickDebounce = debounce(
+//            CLICK_DEBOUNCE_DELAY_MILLIS,
+//            viewLifecycleOwner.lifecycleScope,
+//            false
+//        ) { track ->
+//            viewModel.saveTrack(track)
+//            startPlayerActivity(track)
+//        }
+//
+//        trackAdapter.onItemClickListener = { onTrackClickDebounce(it) }
+//
+//        trackHistoryAdapter.onItemClickListener = { onTrackClickDebounce(it) }
+//
+//        binding.clearIcon.setOnClickListener {
+//            clearSearchText()
+//            binding.tracksList.isVisible = false
+//            tracks.clear()
+//            trackAdapter.notifyDataSetChanged()
+//        }
+//
+//        binding.queryInput.setOnFocusChangeListener { _, hasFocus ->
+//            if (hasFocus && binding.queryInput.text.isEmpty()) {
+//                viewModel.queryInputOnFocused()
+//            }
+//        }
+//
+//        binding.btnPlaceholder.setOnClickListener {
+//            viewModel.search(binding.queryInput.text.toString())
+//        }
+//
+//        binding.clearHistoryButton.setOnClickListener {
+//            binding.trackHistoryContainer.isVisible = false
+//            tracksHistory.clear()
+//            trackHistoryAdapter.notifyDataSetChanged()
+//            viewModel.clearHistory()
+//        }
+//
+//        binding.queryInput.doOnTextChanged { s, _, _, _ ->
+//            binding.clearIcon.isVisible = !s.isNullOrEmpty()
+//            viewModel.onTextChange(s.toString())
+//        }
+//
+//        binding.tracksList.layoutManager =
+//            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+//        binding.tracksList.adapter = trackAdapter
+//
+//        binding.historyList.layoutManager =
+//            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+//        binding.historyList.adapter = trackHistoryAdapter
+//
+//        viewModel.getTrackListState().observe(viewLifecycleOwner) { state ->
+//            when (state) {
+//                is TrackListState.Content -> {
+//                    tracks.clear()
+//                    tracks.addAll(state.tracks)
+//                    trackAdapter.notifyDataSetChanged()
+//                    showTracks()
+//                }
+//
+//                is TrackListState.Error -> {
+//                    showError(state.status)
+//                }
+//
+//                is TrackListState.History -> {
+//                    updateTrackHistoryList(state.tracks)
+//                    if (tracksHistory.isNotEmpty()) {
+//                        showHistory()
+//                    } else {
+//                        hideAll()
+//                    }
+//
+//                }
+//
+//                TrackListState.Loading -> {
+//                    showProgress()
+//                }
+//            }
+//        }
     }
 
     override fun onDestroyView() {
