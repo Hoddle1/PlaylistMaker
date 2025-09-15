@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.playlistmaker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.playlistmaker"
@@ -19,9 +19,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     }
+
     buildFeatures {
         viewBinding = true
+        compose = true
     }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -31,10 +34,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -47,6 +56,7 @@ dependencies {
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
     annotationProcessor(libs.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -67,5 +77,14 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.peko)
     annotationProcessor(libs.androidx.room.room.compiler)
+    debugImplementation(libs.androidx.ui.tooling)
     ksp(libs.androidx.room.room.compiler)
+
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.activity.compose)
+
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.ui.tooling)
+
 }

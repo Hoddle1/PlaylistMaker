@@ -44,6 +44,8 @@
     <color name="toast_playlist_text">#FFFFFF</color>
     <color name="add_to_playlist_bottomsheet_header">#1A1B22</color>
     <color name="playlist_edittext">#1A1B22</color>
+    <color name="unchecked_thumb_color">#AEAFB4</color>
+    <color name="unchecked_track_color">#E6E8EB</color>
 
 
 </resources>

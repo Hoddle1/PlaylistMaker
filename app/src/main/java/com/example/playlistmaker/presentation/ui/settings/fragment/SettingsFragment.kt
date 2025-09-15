@@ -7,19 +7,42 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSettingsBinding
+import com.example.playlistmaker.presentation.ui.settings.components.SettingsButtonItem
+import com.example.playlistmaker.presentation.ui.settings.components.SettingsSwitchItem
 import com.example.playlistmaker.presentation.ui.settings.view_model.SettingsViewModel
+import com.example.playlistmaker.presentation.ui.theme.Fonts
 
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class SettingsFragment : Fragment() {
-
-    private var _binding: FragmentSettingsBinding? = null
-
-    private val binding get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
 
     private val viewModel by viewModel<SettingsViewModel>()
 
@@ -27,48 +50,102 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+        return ComposeView(requireContext()).apply {
+            setContent {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+                val darkTheme by viewModel.observeDarkTheme().observeAsState()
 
-        viewModel.observeDarkTheme().observe(viewLifecycleOwner) { isDarkMode ->
-            when (isDarkMode) {
-                false -> {
-                    binding.scThemeSwitcher.isChecked = false
-                }
+                val checked = when (darkTheme) {
+                    false -> {
+                        false
+                    }
 
-                null -> {
-                    val currentNightMode =
-                        resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                    binding.scThemeSwitcher.isChecked =
+                    null -> {
+                        val currentNightMode =
+                            resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                         currentNightMode == Configuration.UI_MODE_NIGHT_YES
+                    }
+
+                    true -> {
+                        true
+                    }
                 }
 
-                true -> {
-                    binding.scThemeSwitcher.isChecked = true
+                Scaffold(
+                  backgroundColor = Color(LocalContext.current.getColor(R.color.default_background))
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                    ) {
+                        Header()
+                        SettingsItems(
+                            checked = checked
+                        )
+                    }
                 }
             }
         }
-
-
-        binding.scThemeSwitcher.apply {
-            isSaveEnabled = false
-            setOnCheckedChangeListener { _, checked -> viewModel.switchTheme(checked) }
-        }
-
-        binding.mbShareApp.setOnClickListener { shareApp() }
-
-        binding.mbSendSupport.setOnClickListener { sendSupport() }
-
-        binding.mbUserAgreement.setOnClickListener { showUserAgreement() }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    @Composable
+    fun Header() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .padding(bottom = 24.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp)
+
+        ) {
+            Text(
+                text = LocalContext.current.getString(R.string.settings),
+                color = Color(LocalContext.current.getColor(R.color.settings_text_button)),
+                fontWeight = FontWeight.W500,
+                fontFamily = Fonts.YSDisplay,
+                fontSize = 22.sp
+            )
+        }
+    }
+
+
+    @Composable
+    fun SettingsItems(
+        checked: Boolean
+    ) {
+        LazyColumn{
+            item {
+                SettingsSwitchItem(
+                    modifier = Modifier,
+                    text = LocalContext.current.getString(R.string.night_theme),
+                    checked = checked,
+                    onCheckedChange = { checked ->
+                        viewModel.switchTheme(checked)
+                    }
+                )
+                SettingsButtonItem(
+                    modifier = Modifier,
+                    text = LocalContext.current.getString(R.string.share_app),
+                    iconId = R.drawable.ic_share,
+                    onClick = { shareApp() }
+                )
+                SettingsButtonItem(
+                    modifier = Modifier,
+                    text = LocalContext.current.getString(R.string.write_to_support),
+                    iconId = R.drawable.ic_support,
+                    onClick = { sendSupport() }
+                )
+                SettingsButtonItem(
+                    modifier = Modifier,
+                    text = LocalContext.current.getString(R.string.agreement),
+                    iconId = R.drawable.ic_arrow_forward,
+                    onClick = { showUserAgreement() }
+                )
+            }
+        }
     }
 
     private fun shareApp() {
