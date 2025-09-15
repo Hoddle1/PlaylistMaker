@@ -7,10 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,12 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import com.example.playlistmaker.presentation.ui.settings.components.SettingsButtonItem
 import com.example.playlistmaker.presentation.ui.settings.components.SettingsSwitchItem
 import com.example.playlistmaker.presentation.ui.settings.view_model.SettingsViewModel
 import com.example.playlistmaker.presentation.ui.theme.Fonts
-
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
