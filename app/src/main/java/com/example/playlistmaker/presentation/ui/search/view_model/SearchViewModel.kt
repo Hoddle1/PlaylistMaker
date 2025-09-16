@@ -22,14 +22,13 @@ class SearchViewModel(
     private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
 
-    private val trackListState = MutableLiveData<TrackListState>()
-    fun getTrackListState(): LiveData<TrackListState> = trackListState
+    private val trackListState = MutableStateFlow<TrackListState>(TrackListState.Loading)
+    fun getTrackListState(): StateFlow<TrackListState> = trackListState
 
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText.asStateFlow()
 
     private var searchDebounceJob: Job? = null
-
 
 
     init {
@@ -41,8 +40,7 @@ class SearchViewModel(
             favoriteTrackInteractor.favoritesUpdates.collect {
                 if (trackListState.value is TrackListState.Content) {
                     search(_searchText.value)
-                }
-                else if (trackListState.value is TrackListState.History) {
+                } else if (trackListState.value is TrackListState.History) {
                     showHistory()
                 }
             }
@@ -51,7 +49,7 @@ class SearchViewModel(
 
     fun search(queryText: String) {
         if (queryText.isNotEmpty()) {
-            trackListState.postValue(TrackListState.Loading)
+            trackListState.value = TrackListState.Loading
 
             viewModelScope.launch {
                 tracksSearchInteractor
@@ -71,11 +69,11 @@ class SearchViewModel(
         }
 
         if (errorMessage != null) {
-            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NO_INTERNET))
+            trackListState.value = TrackListState.Error(ErrorSearchStatus.NO_INTERNET)
         } else if (tracks.isEmpty()) {
-            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NOT_FOUND))
+            trackListState.value = TrackListState.Error(ErrorSearchStatus.NOT_FOUND)
         } else {
-            trackListState.postValue(TrackListState.Content(tracks))
+            trackListState.value = TrackListState.Content(tracks)
         }
     }
 
@@ -85,6 +83,10 @@ class SearchViewModel(
 
     fun clearHistory() {
         tracksHistoryInteractor.clear()
+    }
+
+    fun clearSearch() {
+        _searchText.value = ""
     }
 
     fun onTextChange(queryText: String) {
@@ -107,7 +109,7 @@ class SearchViewModel(
 
     private fun showHistory() {
         viewModelScope.launch {
-            trackListState.postValue(TrackListState.History(tracksHistoryInteractor.getTracks()))
+            trackListState.value = TrackListState.History(tracksHistoryInteractor.getTracks())
         }
 
     }

@@ -6,15 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,26 +40,23 @@ import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.presentation.ui.player.activity.MediaPlayerActivity
 import com.example.playlistmaker.presentation.ui.search.adapter.TrackAdapter
+import com.example.playlistmaker.presentation.ui.search.components.RoundedButton
 import com.example.playlistmaker.presentation.ui.search.components.SearchField
+import com.example.playlistmaker.presentation.ui.search.components.TrackItem
 import com.example.playlistmaker.presentation.ui.search.view_model.ErrorSearchStatus
 import com.example.playlistmaker.presentation.ui.search.view_model.SearchViewModel
+import com.example.playlistmaker.presentation.ui.search.view_model.TrackListState
 import com.example.playlistmaker.presentation.ui.theme.Fonts
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
-
     private val binding
         get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
-
     private val tracks: MutableList<Track> = mutableListOf()
-
     private val tracksHistory: MutableList<Track> = mutableListOf()
-
     private val trackHistoryAdapter = TrackAdapter(tracksHistory)
-
     private val trackAdapter = TrackAdapter(tracks)
-
     private val viewModel by viewModel<SearchViewModel>()
 
     private lateinit var onTrackClickDebounce: (Track) -> Unit
@@ -64,7 +69,8 @@ class SearchFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
             setContent {
-                val searchText = viewModel.searchText.collectAsState()
+                val searchText by viewModel.searchText.collectAsState()
+                val state: TrackListState by viewModel.getTrackListState().collectAsState()
 
                 Scaffold(
                     backgroundColor = Color(LocalContext.current.getColor(R.color.default_background))
@@ -73,25 +79,48 @@ class SearchFragment : Fragment() {
                         modifier = Modifier
                             .padding(innerPadding)
                     ) {
+
                         Header()
 
                         SearchField(
-                            value = searchText.value,
+                            value = searchText,
                             onValueChange = { text ->
                                 viewModel.onTextChange(text)
                             },
                             onClear = {
-                                clearSearchText()
-//                                binding.tracksList.isVisible = false
-//                                tracks.clear()
-//                                trackAdapter.notifyDataSetChanged()
+                                viewModel.clearSearch()
                             }
                         )
+
+                        when (val s = state) {
+                            is TrackListState.Content -> {
+                                TrackList(s.tracks)
+                            }
+
+                            is TrackListState.Error -> {
+                                ErrorView(s.status)
+                            }
+
+                            is TrackListState.History -> {
+                                if (tracksHistory.isNotEmpty()) {
+                                    TrackHistoryList(s.tracks)
+                                } else {
+                                    EmptyPlaceholder()
+                                }
+
+                            }
+
+                            TrackListState.Loading -> {
+                                LoadingView()
+                            }
+
+                        }
                     }
                 }
             }
         }
     }
+
 
     @Composable
     fun Header() {
@@ -113,6 +142,56 @@ class SearchFragment : Fragment() {
             )
         }
     }
+
+    @Composable
+    fun TrackList(
+        tracks: List<Track>
+    ) {
+        LazyColumn {
+            items(
+                items = tracks,
+                key = { it.trackId }
+            ) { track ->
+                TrackItem(
+                    track = track
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun TrackHistoryList(
+        tracks: List<Track>
+    ) {
+        TrackList(tracks)
+        Spacer(Modifier.height(24.dp))
+        RoundedButton(
+            text = LocalContext.current.getString(R.string.clear_history)
+        ) { }
+    }
+
+
+    @Composable
+    fun LoadingView() {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(
+                color = Color(LocalContext.current.getColor(R.color.progress))
+            )
+        }
+    }
+
+    @Composable
+    fun ErrorView(status: ErrorSearchStatus) {
+        Text("Error")
+    }
+
+    @Composable
+    fun EmptyPlaceholder() {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Пусто")
+        }
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -195,11 +274,6 @@ class SearchFragment : Fragment() {
 //                }
 //            }
 //        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     @SuppressLint("NotifyDataSetChanged")
