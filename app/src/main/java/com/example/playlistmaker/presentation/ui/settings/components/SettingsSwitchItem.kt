@@ -16,8 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,7 +49,7 @@ fun SettingsSwitchItem(
     ) {
         Text(
             text = text,
-            color = Color(LocalContext.current.getColor(R.color.settings_text_button)),
+            color = colorResource(R.color.settings_text_button),
             fontWeight = FontWeight.Normal,
             fontFamily = Fonts.YSDisplay,
             fontSize = 16.sp
@@ -60,9 +60,9 @@ fun SettingsSwitchItem(
                 onCheckedChange(checked)
             },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color(LocalContext.current.getColor(R.color.control)),
-                uncheckedThumbColor = Color(LocalContext.current.getColor(R.color.unchecked_thumb_color)),
-                uncheckedTrackColor = Color(LocalContext.current.getColor(R.color.unchecked_track_color)),
+                checkedThumbColor = colorResource(R.color.control),
+                uncheckedThumbColor = colorResource(R.color.unchecked_thumb_color),
+                uncheckedTrackColor = colorResource(R.color.unchecked_track_color),
                 uncheckedTrackAlpha = 1F
             )
         )
@@ -74,7 +74,7 @@ fun SettingsSwitchItem(
 private fun SettingsSwitchUnCheckedItemPreview() {
     SettingsSwitchItem(
         modifier = Modifier,
-        text = LocalContext.current.getString(R.string.night_theme),
+        text = stringResource(R.string.night_theme),
         checked = false,
         onCheckedChange = {}
     )
@@ -88,7 +88,7 @@ private fun SettingsSwitchUnCheckedItemPreview() {
 private fun SettingsSwitchCheckedItemPreview() {
     SettingsSwitchItem(
         modifier = Modifier,
-        text = LocalContext.current.getString(R.string.night_theme),
+        text = stringResource(R.string.night_theme),
         checked = true,
         onCheckedChange = {}
     )

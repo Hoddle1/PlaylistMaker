@@ -90,4 +90,6 @@ dependencies {
     implementation("io.coil-kt:coil:2.6.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
 
+    implementation("io.insert-koin:koin-androidx-compose:3.3.0")
+
 }

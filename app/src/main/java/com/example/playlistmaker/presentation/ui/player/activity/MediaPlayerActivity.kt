@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +30,7 @@ import com.example.playlistmaker.presentation.ui.player.view_model.BottomSheetSt
 import com.example.playlistmaker.presentation.ui.player.view_model.MediaPlayerState
 import com.example.playlistmaker.presentation.ui.player.view_model.MediaPlayerViewModel
 import com.example.playlistmaker.presentation.ui.playlist_form.fragment.AddPlaylistFragment
+import com.example.playlistmaker.presentation.util.CompanionClass.Companion.CLICK_DEBOUNCE_DELAY_MILLIS
 import com.example.playlistmaker.presentation.util.UiMessageHelper
 import com.example.playlistmaker.presentation.util.Utils
 import com.example.playlistmaker.presentation.util.Utils.debounce
@@ -270,7 +270,6 @@ class MediaPlayerActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        Log.i("ACTIVITY", "onStop")
         viewModel.startForeground()
         super.onStop()
     }
@@ -281,7 +280,6 @@ class MediaPlayerActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
         private const val TRACK_DATA = "TRACK_DATA"
 
         fun createArgs(track: Track): Bundle = bundleOf(TRACK_DATA to track)

@@ -1,4 +1,4 @@
-package com.example.playlistmaker.presentation.ui.search.components
+package com.example.playlistmaker.presentation.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,8 +8,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,13 +27,13 @@ fun RoundedButton(
         onClick = { onClick() },
         shape = RoundedCornerShape(54.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(LocalContext.current.getColor(R.color.default_btn_background))
+            backgroundColor = colorResource(R.color.default_btn_background)
         ),
         contentPadding = PaddingValues(vertical = 10.dp, horizontal = 14.dp)
     ) {
         Text(
             text = text,
-            color = Color(LocalContext.current.getColor(R.color.default_btn_text)),
+            color = colorResource(R.color.default_btn_text),
             fontFamily = Fonts.YSDisplay,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,

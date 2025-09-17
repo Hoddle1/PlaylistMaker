@@ -13,17 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +37,7 @@ fun SearchField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
+    onFocus: () -> Unit,
     onClear: () -> Unit,
 ) {
     BasicTextField(
@@ -46,9 +47,14 @@ fun SearchField(
             .height(36.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(
-                Color(LocalContext.current.getColor(R.color.search_field_background))
+                colorResource(R.color.search_field_background)
             )
-            .padding(vertical = 8.dp, horizontal = 12.dp),
+            .padding(vertical = 8.dp, horizontal = 12.dp)
+            .onFocusChanged {
+                if (it.isFocused) {
+                    onFocus()
+                }
+            },
         value = value,
         onValueChange = { text ->
             onValueChange(text)
@@ -58,9 +64,11 @@ fun SearchField(
             fontSize = 16.sp,
             fontFamily = Fonts.YSDisplay,
             fontWeight = FontWeight.Normal,
-            color = Color(LocalContext.current.getColor(R.color.main_text))
+            color = colorResource(R.color.main_text)
         ),
-        cursorBrush = SolidColor(Color(LocalContext.current.getColor(R.color.control))),
+        cursorBrush = SolidColor(
+            colorResource(R.color.control)
+        ),
         decorationBox = { innerTextField ->
             Row(
                 Modifier.fillMaxSize(),
@@ -69,7 +77,7 @@ fun SearchField(
                 Icon(
                     painter = painterResource(R.drawable.ic_search_16),
                     contentDescription = null,
-                    tint = Color(LocalContext.current.getColor(R.color.text_color_hint))
+                    tint = colorResource(R.color.text_color_hint)
                 )
                 Spacer(Modifier.width(8.dp))
                 Box(
@@ -78,8 +86,8 @@ fun SearchField(
                 ) {
                     if (value.isEmpty()) {
                         Text(
-                            LocalContext.current.getString(R.string.search),
-                            color = Color(LocalContext.current.getColor(R.color.text_color_hint))
+                            stringResource(R.string.search),
+                            color = colorResource(R.color.text_color_hint)
                         )
                     }
                     innerTextField()
@@ -90,20 +98,16 @@ fun SearchField(
                     Icon(
                         modifier = Modifier
                             .clickable(
-                                onClick = {
-                                    onClear()
-                                }
+                                onClick = onClear
                             ),
                         painter = painterResource(R.drawable.ic_cross),
                         contentDescription = null,
-                        tint = Color(LocalContext.current.getColor(R.color.text_color_hint)),
+                        tint = colorResource(R.color.text_color_hint),
                     )
                 }
             }
-        }
+        },
     )
-
-
 }
 
 @Preview(showBackground = true)
@@ -112,6 +116,7 @@ private fun SearchFieldLightPreview() {
     SearchField(
         value = "",
         onValueChange = {},
+        onFocus = {},
         onClear = {}
     )
 }
@@ -125,6 +130,7 @@ private fun SearchFieldLightDarkPreview() {
     SearchField(
         value = "dasdasd",
         onValueChange = {},
+        onFocus = {},
         onClear = {}
     )
 }

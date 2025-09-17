@@ -1,8 +1,5 @@
 package com.example.playlistmaker.presentation.ui.search.view_model
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.db.FavoriteTrackInteractor
@@ -22,14 +19,13 @@ class SearchViewModel(
     private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
 
-    private val trackListState = MutableStateFlow<TrackListState>(TrackListState.Loading)
+    private val trackListState = MutableStateFlow<TrackListState>(TrackListState.Empty)
     fun getTrackListState(): StateFlow<TrackListState> = trackListState
 
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText.asStateFlow()
 
     private var searchDebounceJob: Job? = null
-
 
     init {
         observeFavoriteUpdates()
@@ -64,7 +60,6 @@ class SearchViewModel(
     private fun processResult(foundNames: List<Track>?, errorMessage: String?) {
         val tracks = mutableListOf<Track>()
         if (foundNames != null) {
-            Log.i("text", tracks.toString())
             tracks.addAll(foundNames)
         }
 
@@ -82,11 +77,13 @@ class SearchViewModel(
     }
 
     fun clearHistory() {
+        trackListState.value = TrackListState.Empty
         tracksHistoryInteractor.clear()
     }
 
     fun clearSearch() {
         _searchText.value = ""
+        showHistory()
     }
 
     fun onTextChange(queryText: String) {
@@ -109,9 +106,9 @@ class SearchViewModel(
 
     private fun showHistory() {
         viewModelScope.launch {
-            trackListState.value = TrackListState.History(tracksHistoryInteractor.getTracks())
+            val tracks = tracksHistoryInteractor.getTracks()
+            trackListState.value = TrackListState.History(tracks)
         }
-
     }
 
     fun queryInputOnFocused() {

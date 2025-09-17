@@ -2,6 +2,11 @@ package com.example.playlistmaker.presentation.util
 
 import android.content.Context
 import android.util.TypedValue
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -51,5 +56,24 @@ object Utils {
                 }
             }
         }
+    }
+
+    @Composable
+    fun <T> rememberDebounce(
+        delayMillis: Long = 1000L,
+        useLastParam: Boolean = true,
+        action: (T) -> Unit
+    ): (T) -> Unit {
+        val scope = rememberCoroutineScope()
+        val actionState by rememberUpdatedState(action)
+        return remember(delayMillis, useLastParam) {
+            debounce(delayMillis, scope, useLastParam) { t -> actionState(t) }
+        }
+    }
+}
+
+class CompanionClass() {
+    companion object {
+        const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
     }
 }

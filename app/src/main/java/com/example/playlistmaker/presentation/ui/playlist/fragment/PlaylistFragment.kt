@@ -2,7 +2,6 @@ package com.example.playlistmaker.presentation.ui.playlist.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +27,7 @@ import com.example.playlistmaker.presentation.ui.playlist.entity.ShareEvent
 import com.example.playlistmaker.presentation.ui.playlist.entity.UiEvent
 import com.example.playlistmaker.presentation.ui.playlist.view_model.PlaylistViewModel
 import com.example.playlistmaker.presentation.ui.playlist_form.fragment.EditPlaylistFragment
+import com.example.playlistmaker.presentation.util.CompanionClass.Companion.CLICK_DEBOUNCE_DELAY_MILLIS
 import com.example.playlistmaker.presentation.util.UiMessageHelper
 import com.example.playlistmaker.presentation.util.Utils.debounce
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -109,13 +109,10 @@ class PlaylistFragment : Fragment() {
 
         binding.iBtnShare.post {
             val targetElement = binding.iBtnShare.bottom
-            Log.i("targetElement", targetElement.toString())
             val screenHeight = resources.displayMetrics.heightPixels
-            Log.i("screenHeight", screenHeight.toString())
             val peekHeight =
                 screenHeight - targetElement - (insets?.top ?: 0) - (insets?.bottom
                     ?: 0)
-            Log.i("mypeekHeight", peekHeight.toString())
             bottomSheetBehaviorTracks.peekHeight = maxOf(peekHeight, MIN_PEEK_HEIGHT)
             bottomSheetBehaviorTracks.state = BottomSheetBehavior.STATE_COLLAPSED
         }
@@ -331,7 +328,6 @@ class PlaylistFragment : Fragment() {
 
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
         private const val MIN_PEEK_HEIGHT = 200
 
         private const val PLAYLIST_ID = "PLAYLIST_ID"

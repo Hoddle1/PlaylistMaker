@@ -15,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +54,7 @@ fun SettingsButtonItem(
     ) {
         Text(
             text = text,
-            color = Color(LocalContext.current.getColor(R.color.settings_text_button)),
+            color = colorResource(R.color.settings_text_button),
             fontWeight = FontWeight.Normal,
             fontFamily = Fonts.YSDisplay,
             fontSize = 16.sp
@@ -62,7 +62,7 @@ fun SettingsButtonItem(
         Icon(
             painter = painterResource(iconId),
             contentDescription = contentDescription,
-            tint = Color(LocalContext.current.getColor(R.color.settings_icon_hint)),
+            tint = colorResource(R.color.settings_icon_hint),
         )
     }
 }
@@ -73,7 +73,7 @@ fun SettingsButtonItem(
 private fun SettingsButtonItemLightPreview() {
     SettingsButtonItem(
         modifier = Modifier,
-        text = LocalContext.current.getString(R.string.share_app),
+        text = stringResource(R.string.share_app),
         iconId = R.drawable.ic_share,
         onClick = {}
     )
@@ -86,7 +86,7 @@ private fun SettingsButtonItemLightPreview() {
 private fun SettingsButtonItemDarkPreview() {
     SettingsButtonItem(
         modifier = Modifier,
-        text = LocalContext.current.getString(R.string.share_app),
+        text = stringResource(R.string.share_app),
         iconId = R.drawable.ic_share,
         onClick = {}
     )
