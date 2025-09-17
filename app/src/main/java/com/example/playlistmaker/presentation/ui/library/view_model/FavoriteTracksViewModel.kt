@@ -1,12 +1,12 @@
 package com.example.playlistmaker.presentation.ui.library.view_model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.db.FavoriteTrackInteractor
 import com.example.playlistmaker.domain.entity.Track
 import com.example.playlistmaker.domain.search.TrackHistoryInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -16,9 +16,9 @@ class FavoriteTracksViewModel(
 ) : ViewModel() {
 
     private var favoriteTracksState =
-        MutableLiveData<FavoriteTracksState>(FavoriteTracksState.Empty())
+        MutableStateFlow<FavoriteTracksState>(FavoriteTracksState.Empty())
 
-    fun getFavoriteTracksState(): LiveData<FavoriteTracksState> = favoriteTracksState
+    fun getFavoriteTracksState(): StateFlow<FavoriteTracksState> = favoriteTracksState
 
     init {
         observeFavoritesUpdates()
@@ -42,9 +42,9 @@ class FavoriteTracksViewModel(
                 }
                 .collect { tracks ->
                     if (tracks.isEmpty()) {
-                        favoriteTracksState.postValue(FavoriteTracksState.Empty())
+                        favoriteTracksState.value = FavoriteTracksState.Empty()
                     } else {
-                        favoriteTracksState.postValue(FavoriteTracksState.Content(tracks))
+                        favoriteTracksState.value = FavoriteTracksState.Content(tracks)
                     }
                 }
         }

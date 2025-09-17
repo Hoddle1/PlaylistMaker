@@ -1,7 +1,5 @@
 package com.example.playlistmaker.presentation.ui.search.view_model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.db.FavoriteTrackInteractor
@@ -10,6 +8,9 @@ import com.example.playlistmaker.domain.search.TrackHistoryInteractor
 import com.example.playlistmaker.domain.search.TracksSearchInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -18,11 +19,13 @@ class SearchViewModel(
     private val favoriteTrackInteractor: FavoriteTrackInteractor
 ) : ViewModel() {
 
-    private val trackListState = MutableLiveData<TrackListState>()
-    private var searchText = ""
-    private var searchDebounceJob: Job? = null
+    private val trackListState = MutableStateFlow<TrackListState>(TrackListState.Empty)
+    fun getTrackListState(): StateFlow<TrackListState> = trackListState
 
-    fun getTrackListState(): LiveData<TrackListState> = trackListState
+    private val _searchText = MutableStateFlow("")
+    val searchText: StateFlow<String> = _searchText.asStateFlow()
+
+    private var searchDebounceJob: Job? = null
 
     init {
         observeFavoriteUpdates()
@@ -32,9 +35,8 @@ class SearchViewModel(
         viewModelScope.launch {
             favoriteTrackInteractor.favoritesUpdates.collect {
                 if (trackListState.value is TrackListState.Content) {
-                    search(searchText)
-                }
-                else if (trackListState.value is TrackListState.History) {
+                    search(_searchText.value)
+                } else if (trackListState.value is TrackListState.History) {
                     showHistory()
                 }
             }
@@ -43,7 +45,7 @@ class SearchViewModel(
 
     fun search(queryText: String) {
         if (queryText.isNotEmpty()) {
-            trackListState.postValue(TrackListState.Loading)
+            trackListState.value = TrackListState.Loading
 
             viewModelScope.launch {
                 tracksSearchInteractor
@@ -62,11 +64,11 @@ class SearchViewModel(
         }
 
         if (errorMessage != null) {
-            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NO_INTERNET))
+            trackListState.value = TrackListState.Error(ErrorSearchStatus.NO_INTERNET)
         } else if (tracks.isEmpty()) {
-            trackListState.postValue(TrackListState.Error(ErrorSearchStatus.NOT_FOUND))
+            trackListState.value = TrackListState.Error(ErrorSearchStatus.NOT_FOUND)
         } else {
-            trackListState.postValue(TrackListState.Content(tracks))
+            trackListState.value = TrackListState.Content(tracks)
         }
     }
 
@@ -75,13 +77,19 @@ class SearchViewModel(
     }
 
     fun clearHistory() {
+        trackListState.value = TrackListState.Empty
         tracksHistoryInteractor.clear()
     }
 
-    fun onTextChange(queryText: String) {
-        if (searchText == queryText) return
+    fun clearSearch() {
+        _searchText.value = ""
+        showHistory()
+    }
 
-        searchText = queryText
+    fun onTextChange(queryText: String) {
+        if (_searchText.value == queryText) return
+
+        _searchText.value = queryText
 
         searchDebounceJob?.cancel()
 
@@ -91,16 +99,16 @@ class SearchViewModel(
         } else {
             searchDebounceJob = viewModelScope.launch {
                 delay(SEARCH_DEBOUNCE_DELAY_MILLIS)
-                search(searchText)
+                search(_searchText.value)
             }
         }
     }
 
     private fun showHistory() {
         viewModelScope.launch {
-            trackListState.postValue(TrackListState.History(tracksHistoryInteractor.getTracks()))
+            val tracks = tracksHistoryInteractor.getTracks()
+            trackListState.value = TrackListState.History(tracks)
         }
-
     }
 
     fun queryInputOnFocused() {

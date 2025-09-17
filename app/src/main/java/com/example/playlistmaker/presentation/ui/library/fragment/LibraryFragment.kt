@@ -4,46 +4,60 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.FragmentLibraryBinding
-import com.example.playlistmaker.presentation.ui.library.adapter.LibraryViewPagerAdapter
-import com.google.android.material.tabs.TabLayoutMediator
+import com.example.playlistmaker.domain.entity.Playlist
+import com.example.playlistmaker.domain.entity.Track
+import com.example.playlistmaker.presentation.ui.library.screens.LibraryScreen
+import com.example.playlistmaker.presentation.ui.player.activity.MediaPlayerActivity
+import com.example.playlistmaker.presentation.ui.playlist.fragment.PlaylistFragment
 
 
 class LibraryFragment : Fragment() {
-
-    private var _binding: FragmentLibraryBinding? = null
-
-    private val binding get() = _binding ?: throw IllegalStateException(getString(R.string.binding_is_null))
-
-    private lateinit var tabMediator: TabLayoutMediator
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLibraryBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+        return ComposeView(requireContext()).apply {
+            setContent {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.viewPager.adapter = LibraryViewPagerAdapter(childFragmentManager, lifecycle)
-
-        tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            when (position) {
-                0 -> tab.text = getString(R.string.favorites_tracks)
-                1 -> tab.text = getString(R.string.playlists)
+                LibraryScreen(
+                    onStartPlayerActivity = { track ->
+                        startPlayerActivity(track)
+                    },
+                    onStartPlaylistDetailFragment = { playlsit ->
+                        startPlaylistDetailFragment(playlsit)
+                    },
+                    onStartNewPlaylistFragment = { startNewPlaylistFragment() }
+                )
             }
         }
-        tabMediator.attach()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        tabMediator.detach()
+    private fun startPlayerActivity(track: Track) {
+        findNavController().navigate(
+            R.id.action_libraryFragment_to_mediaPlayerActivity,
+            MediaPlayerActivity.createArgs(track)
+        )
     }
+
+    private fun startPlaylistDetailFragment(playlist: Playlist) {
+        findNavController().navigate(
+            R.id.action_libraryFragment_to_playlistFragment,
+            PlaylistFragment.createArgs(playlist.id)
+        )
+    }
+
+    private fun startNewPlaylistFragment() {
+        findNavController().navigate(
+            R.id.action_libraryFragment_to_addPlaylistFragment
+        )
+    }
+
+
 }
+

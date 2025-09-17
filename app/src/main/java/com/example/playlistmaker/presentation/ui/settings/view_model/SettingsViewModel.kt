@@ -10,13 +10,12 @@ class SettingsViewModel(
     private val settingsInteractor: SettingsInteractor
 ) : ViewModel() {
 
-
     private val isDarkTheme = MutableLiveData<Boolean>(settingsInteractor.getTheme().darkMode)
 
     fun observeDarkTheme(): LiveData<Boolean> = isDarkTheme
 
     fun switchTheme(darkMode: Boolean) {
-        isDarkTheme.postValue(darkMode)
+        isDarkTheme.value = darkMode
 
         settingsInteractor.switchTheme(
             ThemeSettings(
